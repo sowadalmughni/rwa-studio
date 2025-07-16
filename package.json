@@ -1,0 +1,72 @@
+{
+  "name": "rwa-studio",
+  "version": "1.0.0",
+  "description": "Tokenize Real-World Assets in 5 Clicks",
+  "author": "Sowad Al-Mughni <sowadalmughni@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "smart-contracts"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:contracts": "cd smart-contracts && npx hardhat node",
+    "build": "npm run build:frontend && npm run build:backend && npm run build:contracts",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "build:contracts": "cd smart-contracts && npx hardhat compile",
+    "test": "npm run test:contracts && npm run test:backend && npm run test:frontend",
+    "test:contracts": "cd smart-contracts && npx hardhat test",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test",
+    "lint": "npm run lint:frontend && npm run lint:backend && npm run lint:contracts",
+    "lint:frontend": "cd frontend && npm run lint",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:contracts": "cd smart-contracts && npm run lint",
+    "clean": "rm -rf node_modules frontend/node_modules backend/node_modules smart-contracts/node_modules",
+    "setup": "npm install && npm run build:contracts"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sowadalmughni/rwa-studio.git"
+  },
+  "keywords": [
+    "rwa",
+    "tokenization",
+    "erc-3643",
+    "defi",
+    "compliance",
+    "securities",
+    "blockchain",
+    "ethereum",
+    "real-world-assets"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}
+

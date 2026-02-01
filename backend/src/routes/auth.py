@@ -11,9 +11,14 @@ from flask_jwt_extended import (
     create_access_token, create_refresh_token, 
     jwt_required, get_jwt_identity, get_jwt
 )
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from src.models.user import User, db
 import re
+
+
+def utc_now():
+    """Get current UTC time as timezone-aware datetime"""
+    return datetime.now(timezone.utc)
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -133,7 +138,7 @@ def login():
             return jsonify({'success': False, 'error': 'Invalid credentials'}), 401
         
         # Update last login
-        user.last_login = datetime.utcnow()
+        user.last_login = utc_now()
         db.session.commit()
         
         # Generate tokens

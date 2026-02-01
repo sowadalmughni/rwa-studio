@@ -4,10 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge.jsx'
 import { Progress } from '@/components/ui/progress.jsx'
 import { ConnectWallet } from '@/components/wallet'
+import ErrorBoundary from '@/components/ErrorBoundary.jsx'
 import { CheckCircle, Circle, Building, FileText, DollarSign, Users, Rocket } from 'lucide-react'
 import './App.css'
 
-function App() {
+function AppContent() {
   const [currentStep, setCurrentStep] = useState(1)
   const [completedSteps, setCompletedSteps] = useState([])
   const [tokenData, setTokenData] = useState({
@@ -286,6 +287,15 @@ function StepContent({ step, onComplete, tokenData }) {
         </div>
       </CardContent>
     </Card>
+  )
+}
+
+// Main App component wrapped with Error Boundary
+function App() {
+  return (
+    <ErrorBoundary>
+      <AppContent />
+    </ErrorBoundary>
   )
 }
 

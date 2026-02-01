@@ -1,6 +1,12 @@
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, timezone
 import bcrypt
+
+
+def utc_now():
+    """Get current UTC time as timezone-aware datetime"""
+    return datetime.now(timezone.utc)
+
 
 db = SQLAlchemy()
 
@@ -12,8 +18,8 @@ class User(db.Model):
     wallet_address = db.Column(db.String(42), unique=True, nullable=True)  # Ethereum address
     role = db.Column(db.String(20), default='user')  # user, admin, transfer_agent
     is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=utc_now)
+    updated_at = db.Column(db.DateTime, default=utc_now, onupdate=utc_now)
     last_login = db.Column(db.DateTime, nullable=True)
 
     def __init__(
@@ -36,8 +42,8 @@ class User(db.Model):
         self.wallet_address = wallet_address
         self.role = role
         self.is_active = is_active
-        self.created_at = created_at or datetime.utcnow()
-        self.updated_at = updated_at or datetime.utcnow()
+        self.created_at = created_at or utc_now()
+        self.updated_at = updated_at or utc_now()
         self.last_login = last_login
 
     def __repr__(self):

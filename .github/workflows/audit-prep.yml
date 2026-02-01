@@ -1,0 +1,78 @@
+name: Smart Contract Audit Preparation
+
+on:
+  workflow_dispatch:
+    inputs:
+      audit_scope:
+        description: 'Scope of audit (all, core, compliance)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - core
+          - compliance
+
+jobs:
+  prepare-audit:
+    name: Prepare Audit Package
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: smart-contracts
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile contracts
+        run: npx hardhat compile
+
+      - name: Generate contract documentation
+        run: |
+          mkdir -p audit-package
+          npx hardhat docgen || echo "Docgen not configured, skipping..."
+
+      - name: Run static analysis
+        run: |
+          pip install slither-analyzer
+          slither . --json audit-package/slither-analysis.json || true
+
+      - name: Generate inheritance graph
+        run: |
+          pip install surya
+          surya inheritance contracts/*.sol > audit-package/inheritance.txt || true
+          surya graph contracts/*.sol > audit-package/call-graph.dot || true
+
+      - name: Calculate lines of code
+        run: |
+          echo "## Lines of Code Summary" > audit-package/loc-summary.md
+          echo "" >> audit-package/loc-summary.md
+          find contracts -name "*.sol" -exec wc -l {} \; | sort -n >> audit-package/loc-summary.md
+
+      - name: Collect contract metadata
+        run: |
+          echo "## Contract Sizes" > audit-package/contract-sizes.md
+          npx hardhat size-contracts >> audit-package/contract-sizes.md || true
+
+      - name: Package audit materials
+        run: |
+          cp -r contracts audit-package/
+          cp hardhat.config.js audit-package/
+          cp package.json audit-package/
+          cp README.md audit-package/ || true
+          zip -r audit-package.zip audit-package/
+
+      - name: Upload audit package
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-package-${{ github.run_number }}
+          path: smart-contracts/audit-package.zip
+          retention-days: 90

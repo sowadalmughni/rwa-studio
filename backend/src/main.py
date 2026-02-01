@@ -1,3 +1,11 @@
+"""
+RWA-Studio Backend Application
+Author: Sowad Al-Mughni
+
+Main Flask application with production-ready configuration,
+security middleware, rate limiting, and error handling.
+"""
+
 import os
 import sys
 # DON'T CHANGE THIS !!!
@@ -6,24 +14,50 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from flask import Flask, send_from_directory
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from datetime import timedelta
+
+# Import configuration
+from src.config import get_config
+
+# Import middleware
+from src.middleware.rate_limit import init_rate_limiter
+from src.middleware.error_handler import init_error_handlers
+from src.middleware.security import init_security_headers
+
+# Import models and routes
 from src.models.user import db
 from src.routes.user import user_bp
 from src.routes.auth import auth_bp, check_if_token_revoked
 from src.routes.transfer_agent import transfer_agent_bp
 
+# Get validated configuration
+config = get_config()
+
+# Initialize Flask app
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
-# Load configuration from environment or use defaults
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'asdf#FGSgvasgf$5$WGT')
+# Load configuration from config class
+app.config['SECRET_KEY'] = config.SECRET_KEY
+app.config['JWT_SECRET_KEY'] = config.JWT_SECRET_KEY
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = config.JWT_ACCESS_TOKEN_EXPIRES
+app.config['JWT_REFRESH_TOKEN_EXPIRES'] = config.JWT_REFRESH_TOKEN_EXPIRES
+app.config['JWT_TOKEN_LOCATION'] = config.JWT_TOKEN_LOCATION
+app.config['JWT_HEADER_NAME'] = config.JWT_HEADER_NAME
+app.config['JWT_HEADER_TYPE'] = config.JWT_HEADER_TYPE
+app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config.SQLALCHEMY_TRACK_MODIFICATIONS
 
-# JWT Configuration
-app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', app.config['SECRET_KEY'])
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
-app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
-app.config['JWT_TOKEN_LOCATION'] = ['headers']
-app.config['JWT_HEADER_NAME'] = 'Authorization'
-app.config['JWT_HEADER_TYPE'] = 'Bearer'
+# Rate limiting configuration
+app.config['RATELIMIT_STORAGE_URL'] = config.RATELIMIT_STORAGE_URL
+app.config['RATELIMIT_HEADERS_ENABLED'] = config.RATELIMIT_HEADERS_ENABLED
+
+# Initialize security middleware
+init_security_headers(app)
+
+# Initialize error handlers
+init_error_handlers(app)
+
+# Initialize rate limiter
+limiter = init_rate_limiter(app)
 
 # Initialize JWT
 jwt = JWTManager(app)
@@ -34,37 +68,43 @@ jwt.token_in_blocklist_loader(check_if_token_revoked)
 # Error handlers for JWT
 @jwt.expired_token_loader
 def expired_token_callback(jwt_header, jwt_payload):
-    return {'success': False, 'error': 'Token has expired'}, 401
+    return {'success': False, 'error': {'code': 'TOKEN_EXPIRED', 'message': 'Token has expired'}}, 401
 
 @jwt.invalid_token_loader
 def invalid_token_callback(error):
-    return {'success': False, 'error': 'Invalid token'}, 401
+    return {'success': False, 'error': {'code': 'INVALID_TOKEN', 'message': 'Invalid token'}}, 401
 
 @jwt.unauthorized_loader
 def missing_token_callback(error):
-    return {'success': False, 'error': 'Authorization token required'}, 401
+    return {'success': False, 'error': {'code': 'UNAUTHORIZED', 'message': 'Authorization token required'}}, 401
 
 @jwt.revoked_token_loader
 def revoked_token_callback(jwt_header, jwt_payload):
-    return {'success': False, 'error': 'Token has been revoked'}, 401
+    return {'success': False, 'error': {'code': 'TOKEN_REVOKED', 'message': 'Token has been revoked'}}, 401
 
 # Enable CORS for frontend integration
-CORS(app, origins=['http://localhost:5173', 'http://localhost:3000'])
+CORS(app, origins=config.CORS_ORIGINS)
 
 # Register blueprints
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(transfer_agent_bp, url_prefix='/api/transfer-agent')
 
-# Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 # Initialize database
 db.init_app(app)
 
 with app.app_context():
     db.create_all()
+
+# Health check endpoint
+@app.route('/health')
+def health_check():
+    """Health check endpoint for monitoring"""
+    return {
+        'status': 'healthy',
+        'environment': config.FLASK_ENV,
+        'version': '2.0.0'
+    }
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
@@ -84,4 +124,8 @@ def serve(path):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    print(f"🚀 RWA-Studio Backend starting...")
+    print(f"   Environment: {config.FLASK_ENV}")
+    print(f"   Debug: {config.DEBUG}")
+    print(f"   Host: {config.HOST}:{config.PORT}")
+    app.run(host=config.HOST, port=config.PORT, debug=config.DEBUG)

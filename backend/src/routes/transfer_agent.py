@@ -4,12 +4,14 @@ Author: Sowad Al-Mughni
 """
 
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime, timedelta
 from sqlalchemy import desc, func
 from src.models.token import (
     db, TokenDeployment, VerifiedAddress, ComplianceEvent, 
     TransferAgentUser, TokenMetrics
 )
+from src.middleware.auth import transfer_agent_required, admin_required
 import json
 
 transfer_agent_bp = Blueprint('transfer_agent', __name__)
@@ -17,6 +19,7 @@ transfer_agent_bp = Blueprint('transfer_agent', __name__)
 # Token Management Endpoints
 
 @transfer_agent_bp.route('/tokens', methods=['GET'])
+@jwt_required()
 def get_tokens():
     """Get all token deployments with pagination and filtering"""
     try:
@@ -63,6 +66,7 @@ def get_tokens():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @transfer_agent_bp.route('/tokens/<token_address>', methods=['GET'])
+@jwt_required()
 def get_token_details(token_address):
     """Get detailed information about a specific token"""
     try:
@@ -105,6 +109,8 @@ def get_token_details(token_address):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @transfer_agent_bp.route('/tokens', methods=['POST'])
+@jwt_required()
+@transfer_agent_required()
 def register_token():
     """Register a new token deployment"""
     try:
@@ -161,6 +167,7 @@ def register_token():
 # Identity Verification Endpoints
 
 @transfer_agent_bp.route('/tokens/<token_address>/verified-addresses', methods=['GET'])
+@jwt_required()
 def get_verified_addresses(token_address):
     """Get verified addresses for a token"""
     try:
@@ -208,6 +215,8 @@ def get_verified_addresses(token_address):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @transfer_agent_bp.route('/tokens/<token_address>/verified-addresses', methods=['POST'])
+@jwt_required()
+@transfer_agent_required()
 def add_verified_address(token_address):
     """Add a verified address to a token"""
     try:
@@ -267,6 +276,8 @@ def add_verified_address(token_address):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @transfer_agent_bp.route('/verified-addresses/<int:address_id>', methods=['PUT'])
+@jwt_required()
+@transfer_agent_required()
 def update_verified_address(address_id):
     """Update a verified address"""
     try:
@@ -359,6 +370,8 @@ def get_compliance_events(token_address):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @transfer_agent_bp.route('/compliance-events', methods=['POST'])
+@jwt_required()
+@transfer_agent_required()
 def log_compliance_event():
     """Log a new compliance event"""
     try:
@@ -403,6 +416,8 @@ def log_compliance_event():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @transfer_agent_bp.route('/compliance-events/<int:event_id>/resolve', methods=['PUT'])
+@jwt_required()
+@transfer_agent_required()
 def resolve_compliance_event(event_id):
     """Mark a compliance event as resolved"""
     try:

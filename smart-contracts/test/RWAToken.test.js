@@ -7,6 +7,12 @@ describe("RWAToken", function () {
   let IdentityRegistry, identityRegistry;
   let owner, addr1, addr2, addr3;
 
+  // Helper to get future expiration timestamp (1 year from blockchain time)
+  async function getFutureExpiration() {
+    const block = await ethers.provider.getBlock("latest");
+    return block.timestamp + 365 * 24 * 60 * 60; // 1 year from now
+  }
+
   beforeEach(async function () {
     // Get signers
     [owner, addr1, addr2, addr3] = await ethers.getSigners();
@@ -68,11 +74,12 @@ describe("RWAToken", function () {
       expect(await rwaToken.isVerified(addr1.address)).to.equal(false);
 
       // Add verified address
+      const expiration = await getFutureExpiration();
       await identityRegistry.addVerifiedAddress(
         addr1.address,
         1, // Basic verification
         "US",
-        Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60, // 1 year from now
+        expiration,
         ethers.keccak256(ethers.toUtf8Bytes("identity-hash"))
       );
 
@@ -88,11 +95,12 @@ describe("RWAToken", function () {
 
     it("Should allow minting to verified addresses", async function () {
       // Verify address first
+      const expiration = await getFutureExpiration();
       await identityRegistry.addVerifiedAddress(
         addr1.address,
         1,
         "US",
-        Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60,
+        expiration,
         ethers.keccak256(ethers.toUtf8Bytes("identity-hash"))
       );
 
@@ -105,11 +113,12 @@ describe("RWAToken", function () {
   describe("Transfer Controls", function () {
     beforeEach(async function () {
       // Verify addresses
+      const expiration = await getFutureExpiration();
       await identityRegistry.addVerifiedAddress(
         addr1.address,
         1,
         "US",
-        Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60,
+        expiration,
         ethers.keccak256(ethers.toUtf8Bytes("identity-hash-1"))
       );
 
@@ -117,7 +126,7 @@ describe("RWAToken", function () {
         addr2.address,
         1,
         "US",
-        Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60,
+        expiration,
         ethers.keccak256(ethers.toUtf8Bytes("identity-hash-2"))
       );
 
@@ -153,11 +162,12 @@ describe("RWAToken", function () {
   describe("Compliance Integration", function () {
     it("Should check compliance before transfers", async function () {
       // Verify addresses
+      const expiration = await getFutureExpiration();
       await identityRegistry.addVerifiedAddress(
         addr1.address,
         1,
         "US",
-        Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60,
+        expiration,
         ethers.keccak256(ethers.toUtf8Bytes("identity-hash-1"))
       );
 
@@ -165,7 +175,7 @@ describe("RWAToken", function () {
         addr2.address,
         1,
         "US",
-        Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60,
+        expiration,
         ethers.keccak256(ethers.toUtf8Bytes("identity-hash-2"))
       );
 
@@ -211,22 +221,23 @@ describe("RWAToken", function () {
     it("Should prevent non-owners from administrative functions", async function () {
       await expect(
         rwaToken.connect(addr1).pause()
-      ).to.be.revertedWith("Ownable: caller is not the owner");
+      ).to.be.revertedWithCustomError(rwaToken, "OwnableUnauthorizedAccount");
 
       await expect(
         rwaToken.connect(addr1).setTransfersEnabled(true)
-      ).to.be.revertedWith("Ownable: caller is not the owner");
+      ).to.be.revertedWithCustomError(rwaToken, "OwnableUnauthorizedAccount");
     });
   });
 
   describe("Supply Management", function () {
     beforeEach(async function () {
       // Verify address for minting
+      const expiration = await getFutureExpiration();
       await identityRegistry.addVerifiedAddress(
         addr1.address,
         1,
         "US",
-        Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60,
+        expiration,
         ethers.keccak256(ethers.toUtf8Bytes("identity-hash"))
       );
     });

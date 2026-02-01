@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button.jsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
 import { Badge } from '@/components/ui/badge.jsx'
 import { Progress } from '@/components/ui/progress.jsx'
+import { ConnectWallet } from '@/components/wallet'
 import { CheckCircle, Circle, Building, FileText, DollarSign, Users, Rocket } from 'lucide-react'
 import './App.css'
 
@@ -92,7 +93,7 @@ function App() {
               <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
                 🔒 ERC-3643 Compliant
               </Badge>
-              <Button variant="outline">Connect Wallet</Button>
+              <ConnectWallet />
             </div>
           </div>
         </div>

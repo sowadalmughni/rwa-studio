@@ -3,12 +3,16 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "clean": "hardhat clean",
+    "node": "hardhat node",
+    "deploy:local": "hardhat rwa:deploy --network localhost"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": ["rwa", "tokenization", "erc-3643", "security-token"],
+  "author": "Sowad Al-Mughni <sowadalmughni@gmail.com>",
+  "license": "MIT",
+  "description": "ERC-3643 compliant smart contracts for RWA tokenization",
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.9",
     "@nomicfoundation/hardhat-ethers": "^3.0.9",
@@ -20,9 +24,9 @@
     "@nomicfoundation/ignition-core": "^0.15.12",
     "@typechain/ethers-v6": "^0.5.1",
     "@typechain/hardhat": "^9.1.0",
-    "@types/chai": "^5.2.2",
+    "@types/chai": "^4.3.0",
     "@types/mocha": "^10.0.10",
-    "chai": "^5.2.1",
+    "chai": "^4.3.7",
     "ethers": "^6.15.0",
     "hardhat": "^2.25.0",
     "hardhat-gas-reporter": "^2.3.0",

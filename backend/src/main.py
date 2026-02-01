@@ -5,17 +5,54 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from flask import Flask, send_from_directory
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
+from datetime import timedelta
 from src.models.user import db
 from src.routes.user import user_bp
+from src.routes.auth import auth_bp, check_if_token_revoked
 from src.routes.transfer_agent import transfer_agent_bp
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
-app.config['SECRET_KEY'] = 'asdf#FGSgvasgf$5$WGT'
+
+# Load configuration from environment or use defaults
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'asdf#FGSgvasgf$5$WGT')
+
+# JWT Configuration
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', app.config['SECRET_KEY'])
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
+app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
+app.config['JWT_TOKEN_LOCATION'] = ['headers']
+app.config['JWT_HEADER_NAME'] = 'Authorization'
+app.config['JWT_HEADER_TYPE'] = 'Bearer'
+
+# Initialize JWT
+jwt = JWTManager(app)
+
+# Register token revocation callback
+jwt.token_in_blocklist_loader(check_if_token_revoked)
+
+# Error handlers for JWT
+@jwt.expired_token_loader
+def expired_token_callback(jwt_header, jwt_payload):
+    return {'success': False, 'error': 'Token has expired'}, 401
+
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    return {'success': False, 'error': 'Invalid token'}, 401
+
+@jwt.unauthorized_loader
+def missing_token_callback(error):
+    return {'success': False, 'error': 'Authorization token required'}, 401
+
+@jwt.revoked_token_loader
+def revoked_token_callback(jwt_header, jwt_payload):
+    return {'success': False, 'error': 'Token has been revoked'}, 401
 
 # Enable CORS for frontend integration
 CORS(app, origins=['http://localhost:5173', 'http://localhost:3000'])
 
 # Register blueprints
+app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(transfer_agent_bp, url_prefix='/api/transfer-agent')
 

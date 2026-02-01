@@ -2,32 +2,25 @@
 
 **Tokenize Real-World Assets in 5 Clicks**
 
-RWA-Studio is an open-source platform that democratizes real-world asset tokenization by enabling compliant token creation through a simple 5-click workflow. Built for the 2025 boom in compliant RWA token standards, particularly ERC-3643, RWA-Studio bridges the gap between complex enterprise tokenization solutions and the growing demand from lawyers and fund managers.
+Ever tried to tokenize a real estate fund or private equity offering? If you have, you know the pain: enterprise platforms that cost $50K+ upfront, take months to implement, and require a team of blockchain developers. That's exactly what RWA-Studio fixes.
 
-## 🚀 Features
+Whether you're a fund manager launching a Reg D offering, a lawyer structuring a real estate syndication, or a compliance officer managing investor restrictions, RWA-Studio lets you deploy fully compliant security tokens in under 5 minutes—no blockchain experience required.
 
-- **5-Click Tokenization**: Deploy compliant security tokens in under 5 minutes
-- **Compliance-by-Default**: Built-in ERC-3643, Regulation S, and Regulation D support
-- **Transfer Agent Console**: Comprehensive post-deployment token management
-- **OpenZeppelin Plugin**: Seamless integration with existing development workflows
-- **Shareable Asset Pages**: Professional landing pages with dynamic compliance badges
-- **Multi-Chain Support**: Deploy on Ethereum, Polygon, Arbitrum, and other EVM chains
+## What's the Big Idea?
 
-## 🏗️ Architecture
+Imagine you're launching a $10M real estate fund. Traditional tokenization means:
+- 💸 **$50,000+** for enterprise platform licenses
+- ⏰ **3-6 months** of implementation and customization
+- 👥 **A team** of Solidity developers, compliance experts, and integrators
 
-RWA-Studio consists of three main components:
+RWA-Studio flips this entirely:
+- 🆓 **Open source** — no licensing fees, ever
+- ⚡ **5 minutes** — from concept to deployed token
+- 🎯 **5 clicks** — asset type, regulation, economics, restrictions, deploy
 
-1. **Hardhat Templates**: Production-ready smart contract templates implementing ERC-3643
-2. **Transfer Agent Console**: Web-based management interface for token operations
-3. **OpenZeppelin Plugin**: Developer tools for seamless integration
+Built on the **ERC-3643** security token standard (the same one used by BlackRock, Franklin Templeton, and major institutions), RWA-Studio makes institutional-grade compliance accessible to everyone.
 
-## 🛠️ Quick Start
-
-### Prerequisites
-
-- Node.js 18+ and npm
-- Git
-- MetaMask or compatible Web3 wallet
+## Quick Start
 
 ### Installation
 
@@ -36,113 +29,400 @@ RWA-Studio consists of three main components:
 git clone https://github.com/sowadalmughni/rwa-studio.git
 cd rwa-studio
 
-# Install dependencies
-npm install
+# Install all dependencies (frontend, backend, contracts)
+npm run install:all
 
 # Set up environment variables
 cp .env.example .env
 # Edit .env with your configuration
 
-# Start development servers
+# Start development servers (frontend + backend)
 npm run dev
 ```
 
 ### Deploy Your First Token
 
-1. **Asset Type**: Select your asset category (real estate, funds, debt, etc.)
-2. **Regulatory Framework**: Choose Reg D, Reg S, or Reg CF compliance
-3. **Token Economics**: Configure supply, distribution, and vesting
-4. **Investor Restrictions**: Set KYC/AML and transfer limitations
-5. **Deploy**: Generate smart contracts and shareable asset page
+```bash
+# Using the Hardhat CLI
+npx hardhat rwa:deploy \
+  --name "Manhattan Real Estate Fund I" \
+  --symbol "MREF" \
+  --asset-type "real-estate" \
+  --framework "RegD" \
+  --supply 1000000 \
+  --jurisdiction "US"
 
-## 📁 Project Structure
+# Output: ✅ Token deployed at 0x1234...
+#         ✅ Compliance module attached
+#         ✅ Identity registry initialized
+#         ✅ Asset page generated
+```
+
+That's it! You've just deployed an ERC-3643 compliant security token with Reg D restrictions.
+
+### Using Docker (Recommended for Production)
+
+```bash
+# Standard deployment
+docker-compose up -d
+
+# Enterprise stack with PostgreSQL and monitoring
+docker-compose --profile production up -d
+
+# View running services
+docker-compose ps
+```
+
+## Real-World Use Cases
+
+### Fund Managers
+- Launch Reg D/Reg S offerings without enterprise platform fees
+- Automate investor verification and transfer restrictions
+- Generate compliant asset pages for investor relations
+- Track cap table and manage distributions
+
+### Real Estate Syndicators
+- Tokenize commercial properties for fractional ownership
+- Enforce holding periods and accreditation requirements
+- Manage 99-investor limits for 506(b) offerings
+- Generate audit-ready compliance reports
+
+### Private Equity Firms
+- Create liquid secondary markets for LP interests
+- Automate transfer agent functions
+- Enforce geographic and jurisdictional restrictions
+- Maintain real-time investor registries
+
+### Compliance Officers
+- Monitor all token transfers in real-time
+- Verify investor accreditation status
+- Generate regulatory reports on demand
+- Manage KYC/AML verification workflows
+
+## How It Works
+
+RWA-Studio combines three powerful components:
+
+1. **ERC-3643 Smart Contracts**: Institutional-grade security tokens with built-in compliance
+2. **Transfer Agent Console**: Web-based management for post-deployment operations
+3. **Hardhat Plugin**: Developer tools for automation and CI/CD integration
+
+The 5-click flow:
+
+```
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│  1. Asset   │───▶│ 2. Regulation│───▶│ 3. Economics │───▶│ 4. Restrict │───▶│  5. Deploy  │
+│    Type     │    │  Framework   │    │   & Supply   │    │   Investors │    │   & Share   │
+└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
+  Real Estate       Reg D 506(b)       1M tokens          US only            Live on-chain
+  Funds             Reg D 506(c)       Vesting schedule   Accredited only    Asset page
+  Debt              Reg S              Distribution       99 investor max    Compliance active
+  Commodities       Reg CF             Pricing            Holding period
+  Private Equity    Reg A+
+```
+
+## Features
+
+### 🔐 Compliance-by-Default
+
+Built on ERC-3643, every token comes with institutional-grade compliance:
+
+- **5 Modular Compliance Rules**:
+  - `InvestorLimitRule` — Enforce Reg D 99-investor cap or Reg CF 1000-investor limit
+  - `GeographicRule` — Restrict transfers by jurisdiction (US, EU, UK, etc.)
+  - `AccreditedInvestorRule` — Require investor accreditation verification
+  - `HoldingPeriodRule` — Enforce lock-up periods (6mo, 12mo, custom)
+  - `TransferLimitRule` — Cap maximum transfer amounts
+
+- **Multi-Regulatory Support**: Reg D 506(b), Reg D 506(c), Reg S, Reg CF, Reg A+
+
+### 💼 Transfer Agent Console
+
+Full-featured backend API for token management:
+
+- **Identity Registry** — Manage verified investor addresses
+- **Compliance Monitoring** — Real-time transfer validation
+- **Event Logging** — Complete audit trail
+- **JWT + Wallet Auth** — Secure dual authentication
+- **Rate Limiting** — Protection against abuse
+
+### 🔗 Multi-Chain Ready
+
+Deploy on your chain of choice:
+
+| Network | Status |
+|---------|--------|
+| Ethereum Mainnet | ✅ Ready |
+| Polygon | ✅ Ready |
+| Arbitrum | ✅ Ready |
+| Base | ✅ Ready |
+| Sepolia (Testnet) | ✅ Ready |
+
+### 🛠 Developer Friendly
+
+**6 Hardhat Tasks** for automation:
+
+```bash
+# Verify an investor address
+npx hardhat verify-address --token 0x... --address 0x... --level accredited --jurisdiction US
+
+# Check if a transfer would be compliant
+npx hardhat compliance-check --token 0x... --from 0x... --to 0x... --amount 1000
+
+# Add a compliance rule
+npx hardhat add-compliance-rule --token 0x... --rule investor-limit --params '{"maxInvestors": 99}'
+
+# Generate compliance report
+npx hardhat generate-report --token 0x... --format markdown --period 30
+
+# Create shareable asset page
+npx hardhat generate-asset-page --token 0x... --template professional
+```
+
+### 🌐 Modern Web3 Stack
+
+- **Wallet Integration**: MetaMask, WalletConnect, Coinbase Wallet, Rainbow
+- **React 19 + Vite**: Lightning-fast frontend
+- **wagmi + RainbowKit**: Best-in-class Web3 UX
+- **shadcn/ui**: Beautiful, accessible components
+
+### 📊 Enterprise Observability
+
+- **Structured Logging** — JSON-formatted logs for analysis
+- **Health Checks** — Built-in monitoring endpoints
+- **Docker Compose** — One-command deployment
+- **PostgreSQL** — Production-ready database
+
+## Deployment
+
+### Development
+
+```bash
+# Start all services in development mode
+npm run dev
+
+# Or individually:
+npm run dev:frontend    # React app on :5173
+npm run dev:backend     # Flask API on :5000
+npm run dev:contracts   # Hardhat node on :8545
+```
+
+### Production with Docker
+
+```bash
+# Standard deployment (frontend, backend, redis)
+docker-compose up -d
+
+# Full enterprise stack (adds PostgreSQL, monitoring)
+docker-compose --profile production up -d
+
+# Scale backend for high availability
+docker-compose up -d --scale backend=3
+```
+
+### Environment Configuration
+
+```env
+# .env.example
+# Blockchain
+PRIVATE_KEY=your-deployer-private-key
+SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/...
+MAINNET_RPC_URL=https://eth-mainnet.g.alchemy.com/v2/...
+
+# Backend
+JWT_SECRET_KEY=your-super-secret-jwt-key
+DATABASE_URL=postgresql://user:pass@localhost:5432/rwa_studio
+REDIS_URL=redis://localhost:6379
+
+# Frontend
+VITE_API_URL=http://localhost:5000
+VITE_WALLETCONNECT_PROJECT_ID=your-project-id
+```
+
+## Project Structure
 
 ```
 rwa-studio/
-├── frontend/           # React web application
-├── backend/           # Node.js API services
-├── smart-contracts/   # Hardhat templates and contracts
-├── docs/             # Documentation and guides
-├── scripts/          # Deployment and utility scripts
-└── tests/            # Test suites
+├── frontend/                   # React 19 + Vite + shadcn/ui
+│   ├── src/
+│   │   ├── components/         # UI components + wallet integration
+│   │   │   ├── ui/             # shadcn/ui component library
+│   │   │   └── wallet/         # RainbowKit wallet components
+│   │   ├── hooks/              # useWallet, useMobile
+│   │   ├── providers/          # WalletProvider context
+│   │   └── lib/                # Utilities
+│   └── Dockerfile
+│
+├── backend/                    # Flask REST API
+│   ├── src/
+│   │   ├── routes/             # auth, transfer_agent, user
+│   │   ├── middleware/         # auth, rate_limit, security, validation
+│   │   ├── models/             # SQLAlchemy models (User, Token)
+│   │   └── database/           # DB configuration
+│   ├── tests/                  # pytest test suite (40 tests)
+│   └── Dockerfile
+│
+├── smart-contracts/            # Hardhat + Solidity 0.8.28
+│   ├── contracts/
+│   │   ├── RWAToken.sol        # Core ERC-3643 token
+│   │   ├── RWATokenFactory.sol # Factory for token deployment
+│   │   ├── compliance/         # ComplianceModule + 5 rules
+│   │   ├── registry/           # IdentityRegistry for KYC
+│   │   └── interfaces/         # IERC3643 standard interface
+│   ├── scripts/                # 6 Hardhat tasks
+│   └── test/                   # Contract tests (27 tests)
+│
+├── docs/                       # Documentation
+│   ├── DEVELOPER_GUIDE.md
+│   └── SECURITY_AUDIT_BRIEF.md
+│
+├── docker-compose.yml          # Full-stack orchestration
+└── .github/workflows/          # CI/CD pipelines
 ```
 
-## 🔧 Development
+## Roadmap
 
-### Frontend Development
+### Phase 1: Foundation ✅
+- [x] ERC-3643 token implementation
+- [x] 5-click tokenization wizard
+- [x] Wallet integration (RainbowKit)
+- [x] Backend authentication (JWT + wallet)
+- [x] Basic compliance rules
+
+### Phase 2: Security & Quality ✅
+- [x] 5 modular compliance rules
+- [x] Rate limiting & input validation
+- [x] Docker containerization
+- [x] CI/CD pipeline (GitHub Actions)
+- [x] 67 tests (40 backend + 27 contracts)
+- [x] Security audit documentation
+
+### Phase 3: Integration Services (Q1 2026)
+- [ ] KYC provider integration (Onfido, Jumio)
+- [ ] Payment gateway (Stripe, crypto rails)
+- [ ] Email notification service
+- [ ] IPFS document storage
+- [ ] Advanced analytics dashboard
+
+### Phase 4: Scale & Ecosystem (Q2 2026)
+- [ ] Multi-chain deployment automation
+- [ ] Secondary market support
+- [ ] Governance token integration
+- [ ] ONCHAINID identity standard
+- [ ] Mobile application
+
+### Phase 5: Enterprise (Q3-Q4 2026)
+- [ ] White-label solutions
+- [ ] Enterprise SSO/LDAP
+- [ ] Custom compliance rule builder
+- [ ] Professional services & support
+- [ ] Regulatory reporting automation
+
+## Contributing
+
+This is an open-source project and contributions are welcome!
+
+### Getting Started
 
 ```bash
-cd frontend
-npm install
-npm run dev
+# Fork and clone
+git clone https://github.com/YOUR_USERNAME/rwa-studio.git
+cd rwa-studio
+
+# Install dependencies
+npm run install:all
+
+# Create feature branch
+git checkout -b feature/amazing-feature
+
+# Make changes, add tests
+npm test
+
+# Submit pull request
 ```
 
-### Backend Development
+### Development Setup
 
 ```bash
+# Backend development
 cd backend
-npm install
-npm run dev
-```
+python -m venv .venv
+source .venv/bin/activate  # or .venv\Scripts\activate on Windows
+pip install -r requirements.txt
+pytest  # Run tests
 
-### Smart Contract Development
+# Frontend development
+cd frontend
+pnpm install
+pnpm dev
 
-```bash
+# Smart contract development
 cd smart-contracts
 npm install
 npx hardhat compile
 npx hardhat test
 ```
 
-## 🧪 Testing
+### Areas Where We Need Help
 
-```bash
-# Run all tests
-npm test
+- 🔗 Additional blockchain integrations (Solana, Cosmos)
+- 📱 Mobile app development (React Native)
+- 🌍 Internationalization (i18n)
+- 📚 Documentation improvements
+- 🧪 Additional test coverage
+- ♿ Accessibility improvements
 
-# Run specific test suites
-npm run test:contracts
-npm run test:backend
-npm run test:frontend
-```
+## Security
 
-## 📚 Documentation
+Security is critical for financial infrastructure. Here's our approach:
 
-- [User Guide](docs/user-guide.md) - Complete user documentation
-- [Developer Guide](docs/developer-guide.md) - Technical implementation details
-- [API Reference](docs/api-reference.md) - Backend API documentation
-- [Smart Contract Reference](docs/smart-contracts.md) - Contract documentation
+- **ERC-3643 Standard** — Battle-tested security token standard
+- **OpenZeppelin Contracts** — Industry-standard Solidity libraries
+- **Comprehensive Testing** — 67 automated tests
+- **Audit Documentation** — Prepared for OpenZeppelin security audit
+- **Rate Limiting** — Protection against API abuse
+- **Input Validation** — All endpoints validated
 
-## 🤝 Contributing
+### Security Checklist
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+- [x] Secrets in environment variables
+- [x] Rate limiting on all endpoints
+- [x] Input validation middleware
+- [x] SQL injection prevention
+- [x] XSS prevention
+- [x] CORS configuration
+- [x] Content Security Policy headers
+- [ ] Smart contract audit (scheduled)
+- [ ] Penetration testing
+- [ ] Multi-sig for contract ownership
 
-### Development Workflow
+Found a security issue? Please email **sowad@kitalonlabs.com** instead of opening a public issue.
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+## License
 
-## 📄 License
+MIT License — see [LICENSE](LICENSE) for details.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## Acknowledgments
 
-## 🙏 Acknowledgments
+This project builds on the incredible work of:
 
-- [OpenZeppelin](https://openzeppelin.com/) for security standards and tools
-- [Tokeny](https://tokeny.com/) for ERC-3643 standard development
-- [Hardhat](https://hardhat.org/) for development framework
+- [OpenZeppelin](https://openzeppelin.com/) — Security standards and Solidity libraries
+- [Tokeny](https://tokeny.com/) — ERC-3643 security token standard
+- [Hardhat](https://hardhat.org/) — Ethereum development framework
+- [RainbowKit](https://www.rainbowkit.com/) — Beautiful wallet connection
+- [shadcn/ui](https://ui.shadcn.com/) — Stunning React components
 - The broader DeFi and RWA tokenization community
 
-## 📞 Support
+## Support
 
-- **Email**: sowadalmughni@gmail.com
+- **Primary Contact**: Md. Sowad Al-Mughni (sowad@kitalonlabs.com)
+- **Company**: [Kitalon Labs](https://kitalonlabs.com)
+- **Documentation**: [Developer Guide](docs/DEVELOPER_GUIDE.md)
 - **Issues**: [GitHub Issues](https://github.com/sowadalmughni/rwa-studio/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/sowadalmughni/rwa-studio/discussions)
 
 ---
 
-**Built with ❤️ for the future of finance**
+**Maintained by [Kitalon Labs](https://kitalonlabs.com)** — Md. Sowad Al-Mughni (sowad@kitalonlabs.com)
 
+Made with ❤️ for the future of finance

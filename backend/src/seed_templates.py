@@ -1,5 +1,5 @@
 """
-Seed Data Script for RWA-Studio Phase 4
+Seed Data Script for RWA-Studio
 Author: Sowad Al-Mughni
 
 Seeds the database with default asset page templates.

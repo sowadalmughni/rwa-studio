@@ -2,7 +2,7 @@
 Billing Routes for RWA-Studio
 Author: Sowad Al-Mughni
 
-Phase 3: Stripe Payment Gateway API Endpoints
+Stripe Payment Gateway API Endpoints
 """
 
 from flask import Blueprint, request, jsonify, redirect

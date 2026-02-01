@@ -2,7 +2,7 @@
 Document Routes for RWA-Studio
 Author: Sowad Al-Mughni
 
-Phase 3: IPFS Document Storage API Endpoints
+IPFS Document Storage API Endpoints
 """
 
 from flask import Blueprint, request, jsonify, send_file

@@ -90,7 +90,7 @@ class Config:
     LOG_FORMAT = os.environ.get('LOG_FORMAT', 'json')
     
     # ==========================================
-    # PHASE 3: KYC PROVIDER (Onfido)
+    # KYC PROVIDER (Onfido)
     # ==========================================
     
     ONFIDO_API_TOKEN = os.environ.get('ONFIDO_API_TOKEN')
@@ -99,7 +99,7 @@ class Config:
     ONFIDO_REGION = os.environ.get('ONFIDO_REGION', 'us')
     
     # ==========================================
-    # PHASE 3: PAYMENT GATEWAY (Stripe)
+    # PAYMENT GATEWAY (Stripe)
     # ==========================================
     
     STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
@@ -112,7 +112,7 @@ class Config:
     STRIPE_PRICE_ENTERPRISE = os.environ.get('STRIPE_PRICE_ENTERPRISE')
     
     # ==========================================
-    # PHASE 3: EMAIL SERVICE (SendGrid)
+    # EMAIL SERVICE (SendGrid)
     # ==========================================
     
     SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
@@ -120,7 +120,7 @@ class Config:
     EMAIL_FROM_NAME = os.environ.get('EMAIL_FROM_NAME', 'RWA-Studio')
     
     # ==========================================
-    # PHASE 3: IPFS STORAGE (Pinata)
+    # IPFS STORAGE (Pinata)
     # ==========================================
     
     PINATA_API_KEY = os.environ.get('PINATA_API_KEY')
@@ -129,7 +129,7 @@ class Config:
     IPFS_GATEWAY_URL = os.environ.get('IPFS_GATEWAY_URL', 'https://gateway.pinata.cloud/ipfs')
     
     # ==========================================
-    # PHASE 3: CELERY (Async Tasks)
+    # CELERY (Async Tasks)
     # ==========================================
     
     CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379/1')

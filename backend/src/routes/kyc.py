@@ -2,7 +2,7 @@
 KYC Routes for RWA-Studio
 Author: Sowad Al-Mughni
 
-Phase 3: KYC Provider Integration API Endpoints
+KYC Provider Integration API Endpoints
 """
 
 from flask import Blueprint, request, jsonify, current_app

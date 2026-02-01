@@ -2,7 +2,7 @@
 Subscription model for RWA-Studio SaaS billing
 Author: Sowad Al-Mughni
 
-Phase 3: Payment Gateway Integration
+Payment Gateway Integration
 """
 
 from src.models.user import db, utc_now

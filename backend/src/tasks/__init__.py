@@ -2,7 +2,7 @@
 Celery Tasks Module for RWA-Studio
 Author: Sowad Al-Mughni
 
-Phase 3: Async Task Processing
+Async Task Processing with Celery
 """
 
 from .celery_app import celery_app

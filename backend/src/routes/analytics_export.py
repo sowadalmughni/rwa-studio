@@ -1,7 +1,6 @@
 """
 Analytics Export API Routes for RWA-Studio
 Author: Sowad Al-Mughni
-Phase 4: Growth Features
 
 Export analytics data in CSV and PDF formats.
 """

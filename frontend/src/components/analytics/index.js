@@ -1,6 +1,5 @@
 /**
  * Analytics Dashboard Components
- * Phase 3: Advanced Analytics
  */
 
 export { AnalyticsDashboard } from './AnalyticsDashboard';

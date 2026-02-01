@@ -1,7 +1,6 @@
 """
 Embeddable Badge API Routes for RWA-Studio
 Author: Sowad Al-Mughni
-Phase 4: Growth Features
 
 SVG badge generation with aggressive caching for viral growth.
 """

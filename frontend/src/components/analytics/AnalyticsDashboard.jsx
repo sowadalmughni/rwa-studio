@@ -1,7 +1,6 @@
 /**
  * Analytics Dashboard Component
  * Main dashboard view with all analytics components
- * Phase 4: Enhanced with export functionality and additional KPIs
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -65,7 +64,7 @@ export function AnalyticsDashboard({ tokenAddress }) {
         pendingVerificationsTrend: 'down',
         pendingVerificationsTrendValue: '-3',
 
-        // Phase 4: New KPIs
+        // Growth KPIs
         pageViews: 1247,
         pageViewsTrend: 'up',
         pageViewsTrendValue: '+23.4%',
@@ -252,7 +251,7 @@ export function AnalyticsDashboard({ tokenAddress }) {
           trend={stats.pendingVerificationsTrend}
           trendValue={stats.pendingVerificationsTrendValue}
         />
-        {/* Phase 4: New Growth KPIs */}
+        {/* Growth KPIs */}
         <StatCard
           title="Page Views"
           value={stats.pageViews}
@@ -275,7 +274,6 @@ export function AnalyticsDashboard({ tokenAddress }) {
           <CardTitle className="text-lg flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
             Growth Metrics
-            <Badge variant="outline" className="ml-2">Phase 4</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>

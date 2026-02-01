@@ -2,7 +2,7 @@
 Email Tasks for Celery
 Author: Sowad Al-Mughni
 
-Phase 3: Async Email Sending
+Async Email Sending
 """
 
 from .celery_app import celery_app

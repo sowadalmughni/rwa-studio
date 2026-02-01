@@ -2,7 +2,7 @@
 KYC Verification model for RWA-Studio
 Author: Sowad Al-Mughni
 
-Phase 3: KYC Provider Integration
+KYC Provider Integration
 """
 
 from src.models.user import db, utc_now

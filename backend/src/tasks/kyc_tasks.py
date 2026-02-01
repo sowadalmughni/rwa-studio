@@ -2,7 +2,7 @@
 KYC Tasks for Celery
 Author: Sowad Al-Mughni
 
-Phase 3: Async KYC Processing
+Async KYC Processing
 """
 
 from .celery_app import celery_app

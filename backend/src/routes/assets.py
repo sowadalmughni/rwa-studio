@@ -1,7 +1,6 @@
 """
 Public Asset Page API Routes for RWA-Studio
 Author: Sowad Al-Mughni
-Phase 4: Growth Features
 
 Dynamic asset page serving with social meta tags and referral tracking.
 """

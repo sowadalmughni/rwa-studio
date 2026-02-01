@@ -1,6 +1,5 @@
 /**
  * Share Widget Component for RWA-Studio
- * Phase 4: Growth Features
  * 
  * Social sharing buttons with copy embed code functionality
  */

@@ -29,24 +29,20 @@ from src.routes.user import user_bp
 from src.routes.auth import auth_bp, check_if_token_revoked
 from src.routes.transfer_agent import transfer_agent_bp
 
-# Phase 3: Import new routes
+# Additional routes
 from src.routes.kyc import kyc_bp
 from src.routes.documents import documents_bp
 from src.routes.billing import billing_bp
-
-# Phase 4: Import growth feature routes
 from src.routes.badge import badge_bp
 from src.routes.assets import assets_bp
 from src.routes.analytics_export import analytics_export_bp
 
-# Phase 3: Import new models (for db.create_all())
+# Additional models
 from src.models.subscription import Subscription, BillingHistory
 from src.models.kyc import KYCVerification, KYCDocument
-
-# Phase 4: Import referral models
 from src.models.referral import Referral, ShareEvent, AssetPageView, AssetPageTemplate
 
-# Phase 3: Import Celery
+# Celery for background tasks
 from src.tasks.celery_app import init_celery
 
 # Get validated configuration
@@ -110,17 +106,17 @@ app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(transfer_agent_bp, url_prefix='/api/transfer-agent')
 
-# Phase 3: Register new blueprints
+# Integration blueprints
 app.register_blueprint(kyc_bp, url_prefix='/api/kyc')
 app.register_blueprint(documents_bp, url_prefix='/api/documents')
 app.register_blueprint(billing_bp, url_prefix='/api/billing')
 
-# Phase 4: Register growth feature blueprints
+# Growth feature blueprints
 app.register_blueprint(badge_bp, url_prefix='/api/badge')
 app.register_blueprint(assets_bp, url_prefix='/api/assets')
 app.register_blueprint(analytics_export_bp, url_prefix='/api/analytics')
 
-# Phase 3: Initialize Celery with Flask app context
+# Initialize Celery with Flask app context
 celery = init_celery(app)
 
 # Initialize database

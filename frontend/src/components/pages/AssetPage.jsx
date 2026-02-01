@@ -1,6 +1,5 @@
 /**
  * Public Asset Page Component for RWA-Studio
- * Phase 4: Growth Features
  * 
  * Displays token information publicly with sharing and referral support
  */

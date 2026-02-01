@@ -2,7 +2,7 @@
 Celery Application Configuration
 Author: Sowad Al-Mughni
 
-Phase 3: Async Task Processing
+Async Task Processing
 """
 
 from celery import Celery

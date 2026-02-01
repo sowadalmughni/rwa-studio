@@ -1,7 +1,6 @@
 """
 Referral and Share Tracking Models for RWA-Studio
 Author: Sowad Al-Mughni
-Phase 4: Growth Features
 
 Models for tracking referrals, shares, and viral growth metrics.
 """

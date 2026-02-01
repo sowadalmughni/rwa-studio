@@ -1,6 +1,5 @@
 /**
  * Template Selector Component for RWA-Studio
- * Phase 4: Growth Features
  * 
  * Allows users to preview and select asset page templates
  */

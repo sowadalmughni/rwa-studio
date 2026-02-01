@@ -1,6 +1,6 @@
 /**
  * Billing Components for RWA-Studio
- * Phase 3: Stripe Payment Gateway Integration
+ * Stripe Payment Gateway Integration
  */
 
 export { PricingPlans } from './PricingPlans';

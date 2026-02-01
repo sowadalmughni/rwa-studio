@@ -1,5 +1,5 @@
 """
-RWA-Studio Phase 3: External Service Integrations
+RWA-Studio External Service Integrations
 Author: Sowad Al-Mughni
 
 This module provides integrations with external services:

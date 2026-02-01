@@ -10,7 +10,6 @@ from typing import Dict, Any, Optional
 from datetime import datetime
 import httpx
 
-from ..config import get_config
 from .base import KYCService, KYCStatus, KYCResult, ApplicantData
 
 

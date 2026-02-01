@@ -146,17 +146,23 @@ Full-featured backend API for token management:
 - **JWT + Wallet Auth** — Secure dual authentication
 - **Rate Limiting** — Protection against abuse
 
-### 🔗 Multi-Chain Ready
+### 🔗 Network Support
 
-Deploy on your chain of choice:
+RWA-Studio uses ERC-3643 compliant smart contracts that can be deployed to any EVM-compatible network:
 
-| Network | Status |
-|---------|--------|
-| Ethereum Mainnet | ✅ Ready |
-| Polygon | ✅ Ready |
-| Arbitrum | ✅ Ready |
-| Base | ✅ Ready |
-| Sepolia (Testnet) | ✅ Ready |
+| Network | Status | Notes |
+|---------|--------|-------|
+| Ethereum Sepolia | ✅ Tested | Primary testnet for development |
+| Ethereum Mainnet | 🟡 Ready | Requires mainnet RPC and gas |
+| Polygon | 🟡 Ready | Lower gas costs, L2 deployment |
+| Arbitrum | 🟡 Ready | L2 optimistic rollup |
+| Base | 🟡 Ready | Coinbase L2 |
+
+**Status Key:**
+- ✅ **Tested** — Verified working with automated tests
+- 🟡 **Ready** — Contracts compatible, requires network config
+
+**Current Limitation:** The default configuration targets a single network at a time. Multi-chain deployment (deploying the same token across multiple networks) is on the roadmap but not yet implemented. To deploy on a different network, update your Hardhat config with the appropriate RPC URL and deploy separately.
 
 ### 🛠 Developer Friendly
 

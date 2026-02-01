@@ -3,7 +3,7 @@ KYC Service Module
 Provides identity verification via Onfido
 """
 
-from .base import KYCService, KYCStatus, KYCResult
+from .base import KYCService, KYCStatus, KYCResult, ApplicantData
 from .onfido import OnfidoKYCService
 
 _kyc_service = None
@@ -17,4 +17,4 @@ def get_kyc_service() -> KYCService:
     return _kyc_service
 
 
-__all__ = ['KYCService', 'KYCStatus', 'KYCResult', 'OnfidoKYCService', 'get_kyc_service']
+__all__ = ['KYCService', 'KYCStatus', 'KYCResult', 'ApplicantData', 'OnfidoKYCService', 'get_kyc_service']

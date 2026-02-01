@@ -3,6 +3,11 @@ Analytics Export API Routes for RWA-Studio
 Author: Sowad Al-Mughni
 
 Export analytics data in CSV and PDF formats.
+
+Security:
+- JWT authentication required
+- Rate limiting on all endpoints
+- Input validation
 """
 
 from flask import Blueprint, request, jsonify, Response
@@ -11,6 +16,8 @@ from datetime import datetime, timedelta
 from sqlalchemy import desc, func
 from src.models.token import db, TokenDeployment, TokenMetrics, ComplianceEvent, VerifiedAddress
 from src.models.referral import AssetPageView, ShareEvent
+from src.middleware.rate_limit import rate_limit_read
+from src.middleware.validation import is_valid_ethereum_address
 import csv
 import io
 import json
@@ -20,6 +27,7 @@ analytics_export_bp = Blueprint('analytics_export', __name__)
 
 @analytics_export_bp.route('/export/<token_address>', methods=['GET'])
 @jwt_required()
+@rate_limit_read  # Analytics export
 def export_analytics(token_address):
     """
     Export analytics data for a token
@@ -29,9 +37,27 @@ def export_analytics(token_address):
     - days: number of days to include (default: 30)
     - type: 'metrics', 'compliance', 'page_views', 'all' (default: 'all')
     """
+    # Validate token address format
+    if not is_valid_ethereum_address(token_address):
+        return jsonify({'success': False, 'error': 'Invalid token address format'}), 400
+    
     export_format = request.args.get('format', 'json')
+    
+    # Validate format
+    if export_format not in ['csv', 'json', 'pdf']:
+        return jsonify({'success': False, 'error': 'Invalid format. Use csv, json, or pdf'}), 400
+    
     days = request.args.get('days', 30, type=int)
+    
+    # Limit days range to prevent abuse
+    if days < 1 or days > 365:
+        return jsonify({'success': False, 'error': 'Days must be between 1 and 365'}), 400
+    
     data_type = request.args.get('type', 'all')
+    
+    # Validate data type
+    if data_type not in ['metrics', 'compliance', 'page_views', 'all']:
+        return jsonify({'success': False, 'error': 'Invalid type'}), 400
     
     # Look up token
     token = TokenDeployment.query.filter_by(token_address=token_address).first()
@@ -81,9 +107,15 @@ def export_analytics(token_address):
 
 @analytics_export_bp.route('/summary', methods=['GET'])
 @jwt_required()
+@rate_limit_read  # Analytics summary
 def get_analytics_summary():
     """Get aggregate analytics summary across all tokens"""
     days = request.args.get('days', 30, type=int)
+    
+    # Limit days range
+    if days < 1 or days > 365:
+        return jsonify({'success': False, 'error': 'Days must be between 1 and 365'}), 400
+    
     start_date = datetime.utcnow() - timedelta(days=days)
     
     # Total tokens
@@ -138,11 +170,17 @@ def get_analytics_summary():
 
 @analytics_export_bp.route('/referral-report', methods=['GET'])
 @jwt_required()
+@rate_limit_read  # Referral report
 def get_referral_report():
     """Get referral performance report"""
     from src.models.referral import Referral
     
     days = request.args.get('days', 30, type=int)
+    
+    # Limit days range
+    if days < 1 or days > 365:
+        return jsonify({'success': False, 'error': 'Days must be between 1 and 365'}), 400
+    
     start_date = datetime.utcnow() - timedelta(days=days)
     
     # Top referrers

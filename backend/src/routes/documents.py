@@ -3,6 +3,12 @@ Document Routes for RWA-Studio
 Author: Sowad Al-Mughni
 
 IPFS Document Storage API Endpoints
+
+Security:
+- File type validation
+- File size limits
+- Rate limiting
+- Path traversal prevention
 """
 
 from flask import Blueprint, request, jsonify, send_file
@@ -14,6 +20,8 @@ import structlog
 from src.models.user import db, User
 from src.models.token import TokenDeployment
 from src.services.storage import get_storage_service
+from src.middleware.rate_limit import rate_limit_read, rate_limit_write, rate_limit_sensitive
+from src.middleware.validation import sanitize_string, sanitize_filename
 
 logger = structlog.get_logger()
 
@@ -38,6 +46,7 @@ def allowed_file(filename: str) -> bool:
 
 @documents_bp.route('/upload', methods=['POST'])
 @jwt_required()
+@rate_limit_write  # File uploads are write operations
 def upload_document():
     """
     Upload a document to IPFS
@@ -138,6 +147,7 @@ def upload_document():
 
 @documents_bp.route('/upload-json', methods=['POST'])
 @jwt_required()
+@rate_limit_write  # JSON upload is a write operation
 def upload_json():
     """
     Upload JSON metadata to IPFS
@@ -203,6 +213,7 @@ def upload_json():
 
 
 @documents_bp.route('/<ipfs_hash>', methods=['GET'])
+@rate_limit_read  # Public document retrieval
 def get_document(ipfs_hash: str):
     """
     Get document from IPFS
@@ -250,6 +261,7 @@ def get_document(ipfs_hash: str):
 
 
 @documents_bp.route('/<ipfs_hash>/metadata', methods=['GET'])
+@rate_limit_read  # Metadata read
 def get_document_metadata(ipfs_hash: str):
     """Get metadata for a document by IPFS hash"""
     try:
@@ -276,6 +288,7 @@ def get_document_metadata(ipfs_hash: str):
 
 @documents_bp.route('/list', methods=['GET'])
 @jwt_required()
+@rate_limit_read  # Admin list operation
 def list_documents():
     """List pinned documents (admin only)"""
     try:
@@ -321,6 +334,7 @@ def list_documents():
 
 @documents_bp.route('/<ipfs_hash>', methods=['DELETE'])
 @jwt_required()
+@rate_limit_sensitive  # Deletion is sensitive
 def delete_document(ipfs_hash: str):
     """Unpin a document from IPFS (admin only)"""
     try:
@@ -346,6 +360,7 @@ def delete_document(ipfs_hash: str):
 
 
 @documents_bp.route('/verify/<ipfs_hash>', methods=['GET'])
+@rate_limit_read  # Public verification
 def verify_document(ipfs_hash: str):
     """
     Verify a document exists and is pinned

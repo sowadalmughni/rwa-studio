@@ -3,6 +3,10 @@ Public Asset Page API Routes for RWA-Studio
 Author: Sowad Al-Mughni
 
 Dynamic asset page serving with social meta tags and referral tracking.
+
+Security:
+- Rate limiting on all endpoints
+- Input validation for token addresses
 """
 
 from flask import Blueprint, request, jsonify, Response, render_template_string
@@ -10,6 +14,8 @@ from datetime import datetime, date
 from sqlalchemy import func
 from src.models.token import db, TokenDeployment, VerifiedAddress, ComplianceEvent
 from src.models.referral import Referral, ShareEvent, AssetPageView, AssetPageTemplate
+from src.middleware.rate_limit import rate_limit_read, rate_limit_public
+from src.middleware.validation import is_valid_ethereum_address, sanitize_string
 import json
 import hashlib
 
@@ -21,16 +27,21 @@ assets_bp = Blueprint('assets', __name__)
 # ============================================================================
 
 @assets_bp.route('/<token_address>', methods=['GET'])
+@rate_limit_public  # Public asset page access
 def get_asset_page(token_address):
     """
     Get public asset page data for a token
     Tracks page views and handles referral parameters
     """
+    # Validate token address format
+    if not is_valid_ethereum_address(token_address):
+        return jsonify({'success': False, 'error': 'Invalid token address format'}), 400
+    
     # Track referral if present
-    ref_code = request.args.get('ref')
-    utm_source = request.args.get('utm_source')
-    utm_medium = request.args.get('utm_medium')
-    utm_campaign = request.args.get('utm_campaign')
+    ref_code = sanitize_string(request.args.get('ref', ''), max_length=50) if request.args.get('ref') else None
+    utm_source = sanitize_string(request.args.get('utm_source', ''), max_length=100) if request.args.get('utm_source') else None
+    utm_medium = sanitize_string(request.args.get('utm_medium', ''), max_length=100) if request.args.get('utm_medium') else None
+    utm_campaign = sanitize_string(request.args.get('utm_campaign', ''), max_length=100) if request.args.get('utm_campaign') else None
     
     # Look up token
     token = TokenDeployment.query.filter_by(token_address=token_address).first()
@@ -75,11 +86,16 @@ def get_asset_page(token_address):
 
 
 @assets_bp.route('/<token_address>/html', methods=['GET'])
+@rate_limit_public  # Public HTML page
 def get_asset_page_html(token_address):
     """
     Get rendered HTML asset page (for iframe embedding or SSR)
     """
-    template_name = request.args.get('template', 'default')
+    # Validate token address format
+    if not is_valid_ethereum_address(token_address):
+        return Response("Invalid token address", status=400, mimetype='text/plain')
+    
+    template_name = sanitize_string(request.args.get('template', 'default'), max_length=50)
     
     token = TokenDeployment.query.filter_by(token_address=token_address).first()
     
@@ -99,11 +115,15 @@ def get_asset_page_html(token_address):
 
 
 @assets_bp.route('/<token_address>/og-image.png', methods=['GET'])
+@rate_limit_public  # OG image generation
 def get_og_image(token_address):
     """
     Generate Open Graph image for social sharing
     Returns a placeholder for now - would use image generation in production
     """
+    if not is_valid_ethereum_address(token_address):
+        return jsonify({'success': False, 'error': 'Invalid token address'}), 400
+    
     token = TokenDeployment.query.filter_by(token_address=token_address).first()
     
     if not token:
@@ -128,8 +148,12 @@ def get_og_image(token_address):
 # ============================================================================
 
 @assets_bp.route('/<token_address>/share', methods=['POST'])
+@rate_limit_public  # Share tracking
 def track_share(token_address):
     """Track a share event for analytics"""
+    if not is_valid_ethereum_address(token_address):
+        return jsonify({'success': False, 'error': 'Invalid token address'}), 400
+    
     token = TokenDeployment.query.filter_by(token_address=token_address).first()
     
     if not token:
@@ -168,6 +192,7 @@ def track_share(token_address):
 
 
 @assets_bp.route('/referral/create', methods=['POST'])
+@rate_limit_public  # Referral creation
 def create_referral():
     """Create a new referral code for a user"""
     data = request.get_json() or {}
@@ -177,6 +202,12 @@ def create_referral():
     
     if not referrer_address:
         return jsonify({'success': False, 'error': 'referrer_address is required'}), 400
+    
+    # Validate wallet address format
+    if not is_valid_ethereum_address(referrer_address):
+        return jsonify({'success': False, 'error': 'Invalid wallet address format'}), 400
+    
+    referrer_address = referrer_address.lower()
     
     # Check for existing active referral code
     existing = Referral.query.filter_by(
@@ -210,8 +241,11 @@ def create_referral():
 
 
 @assets_bp.route('/referral/<code>/stats', methods=['GET'])
+@rate_limit_public  # Referral stats access
 def get_referral_stats(code):
     """Get statistics for a referral code"""
+    # Sanitize referral code
+    code = sanitize_string(code, max_length=50)
     referral = Referral.query.filter_by(referral_code=code).first()
     
     if not referral:
@@ -228,9 +262,10 @@ def get_referral_stats(code):
 # ============================================================================
 
 @assets_bp.route('/templates', methods=['GET'])
+@rate_limit_read  # Template listing
 def get_templates():
     """Get all available asset page templates"""
-    asset_type = request.args.get('asset_type')
+    asset_type = sanitize_string(request.args.get('asset_type', ''), max_length=50) if request.args.get('asset_type') else None
     include_premium = request.args.get('include_premium', 'true').lower() == 'true'
     
     query = AssetPageTemplate.query.filter_by(is_active=True)
@@ -255,8 +290,10 @@ def get_templates():
 
 
 @assets_bp.route('/templates/<name>', methods=['GET'])
+@rate_limit_read  # Single template access
 def get_template(name):
     """Get a specific template by name"""
+    name = sanitize_string(name, max_length=50)
     template = AssetPageTemplate.query.filter_by(name=name, is_active=True).first()
     
     if not template:
@@ -273,8 +310,12 @@ def get_template(name):
 # ============================================================================
 
 @assets_bp.route('/<token_address>/analytics', methods=['GET'])
+@rate_limit_read  # Analytics data access
 def get_asset_analytics(token_address):
     """Get analytics for an asset page"""
+    if not is_valid_ethereum_address(token_address):
+        return jsonify({'success': False, 'error': 'Invalid token address'}), 400
+    
     token = TokenDeployment.query.filter_by(token_address=token_address).first()
     
     if not token:

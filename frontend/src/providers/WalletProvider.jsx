@@ -2,6 +2,10 @@
  * Wallet Provider Configuration for RWA-Studio
  * 
  * Configures wagmi + RainbowKit for Ethereum wallet integration
+ * 
+ * SECURITY: WalletConnect projectId must be set via environment variable
+ * - Create project at https://cloud.walletconnect.com
+ * - Set VITE_WALLETCONNECT_PROJECT_ID in .env file
  */
 
 import '@rainbow-me/rainbowkit/styles.css';
@@ -11,10 +15,41 @@ import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { mainnet, sepolia, polygon, arbitrum, base, optimism } from 'wagmi/chains';
 
+/**
+ * Get WalletConnect project ID from environment
+ * SECURITY: No fallback to placeholder in production to prevent accidental deployment
+ */
+const getProjectId = () => {
+  const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
+  
+  // In production, require the project ID
+  if (import.meta.env.PROD && (!projectId || projectId === 'YOUR_PROJECT_ID')) {
+    console.error(
+      '[SECURITY ERROR] VITE_WALLETCONNECT_PROJECT_ID is not configured. ' +
+      'Wallet connections will fail. ' +
+      'Create a project at https://cloud.walletconnect.com and add the ID to your .env file.'
+    );
+    // Return empty string - WalletConnect will fail gracefully
+    return '';
+  }
+  
+  // In development, warn if using placeholder
+  if (!projectId || projectId === 'YOUR_PROJECT_ID') {
+    console.warn(
+      '[DEV WARNING] VITE_WALLETCONNECT_PROJECT_ID is not set. ' +
+      'WalletConnect may not work. Get a free project ID from https://cloud.walletconnect.com'
+    );
+    // Allow development to proceed with degraded functionality
+    return projectId || '';
+  }
+  
+  return projectId;
+};
+
 // Configure chains and providers
 const config = getDefaultConfig({
   appName: 'RWA-Studio',
-  projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID', // Get from cloud.walletconnect.com
+  projectId: getProjectId(),
   chains: [
     mainnet,
     sepolia,

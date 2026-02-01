@@ -3,6 +3,11 @@ KYC Routes for RWA-Studio
 Author: Sowad Al-Mughni
 
 KYC Provider Integration API Endpoints
+
+Security:
+- All endpoints require JWT authentication
+- Rate limiting applied to prevent abuse
+- Sensitive operations (start verification) have strict limits
 """
 
 from flask import Blueprint, request, jsonify, current_app
@@ -15,6 +20,8 @@ from src.models.kyc import KYCVerification
 from src.services.kyc import get_kyc_service, ApplicantData, KYCStatus
 from src.tasks.email_tasks import send_kyc_started_email
 from src.tasks.kyc_tasks import process_kyc_webhook
+from src.middleware.rate_limit import rate_limit_sensitive, rate_limit_read, rate_limit_write
+from src.middleware.validation import sanitize_string, is_valid_ethereum_address
 
 logger = structlog.get_logger()
 
@@ -23,6 +30,7 @@ kyc_bp = Blueprint('kyc', __name__, url_prefix='/api/kyc')
 
 @kyc_bp.route('/start', methods=['POST'])
 @jwt_required()
+@rate_limit_sensitive  # Strict rate limiting for KYC initiation
 def start_verification():
     """
     Start KYC verification process
@@ -40,13 +48,25 @@ def start_verification():
     try:
         data = request.get_json()
         
+        if not data:
+            return jsonify({'error': 'Request body required'}), 400
+        
         # Validate required fields
         required_fields = ['wallet_address', 'first_name', 'last_name', 'email']
         for field in required_fields:
             if not data.get(field):
                 return jsonify({'error': f'{field} is required'}), 400
         
-        wallet_address = data['wallet_address'].lower()
+        # Sanitize and validate inputs
+        wallet_address = data['wallet_address'].strip().lower()
+        if not is_valid_ethereum_address(wallet_address):
+            return jsonify({'error': 'Invalid wallet address format'}), 400
+        
+        first_name = sanitize_string(data['first_name'], max_length=100)
+        last_name = sanitize_string(data['last_name'], max_length=100)
+        email = sanitize_string(data['email'], max_length=255)
+        country = sanitize_string(data.get('country', ''), max_length=2) if data.get('country') else None
+        date_of_birth = data.get('date_of_birth')  # Will be validated by KYC service
         
         # Check for existing pending or approved verification
         existing = KYCVerification.query.filter(
@@ -74,12 +94,12 @@ def start_verification():
         kyc_service = get_kyc_service()
         
         applicant_data = ApplicantData(
-            first_name=data['first_name'],
-            last_name=data['last_name'],
-            email=data['email'],
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
             wallet_address=wallet_address,
-            country=data.get('country'),
-            date_of_birth=data.get('date_of_birth')
+            country=country,
+            date_of_birth=date_of_birth
         )
         
         try:
@@ -95,9 +115,9 @@ def start_verification():
             provider=kyc_service.provider_name,
             applicant_id=applicant_result['applicant_id'],
             status='pending',
-            first_name=data['first_name'],
-            last_name=data['last_name'],
-            email=data['email'],
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
             country_code=data.get('country')
         )
         
@@ -142,6 +162,7 @@ def start_verification():
 
 @kyc_bp.route('/check', methods=['POST'])
 @jwt_required()
+@rate_limit_write  # Creating a verification check is a write operation
 def create_check():
     """
     Create verification check after user completes SDK flow
@@ -200,10 +221,14 @@ def create_check():
 
 
 @kyc_bp.route('/status/<wallet_address>', methods=['GET'])
+@rate_limit_read  # Public read endpoint
 def get_verification_status(wallet_address: str):
     """Get KYC verification status for a wallet address"""
     try:
-        wallet_address = wallet_address.lower()
+        # Validate wallet address format
+        wallet_address = wallet_address.strip().lower()
+        if not is_valid_ethereum_address(wallet_address):
+            return jsonify({'error': 'Invalid wallet address format'}), 400
         
         # Get latest verification for this address
         verification = KYCVerification.query.filter_by(
@@ -230,6 +255,7 @@ def get_verification_status(wallet_address: str):
 
 
 @kyc_bp.route('/webhook', methods=['POST'])
+@rate_limit_write  # Webhooks are write operations but from trusted source
 def webhook():
     """
     Handle KYC provider webhooks
@@ -265,6 +291,7 @@ def webhook():
 
 @kyc_bp.route('/verifications', methods=['GET'])
 @jwt_required()
+@rate_limit_read  # Admin list endpoint
 def list_verifications():
     """List all KYC verifications (admin only)"""
     try:
@@ -302,6 +329,7 @@ def list_verifications():
 
 @kyc_bp.route('/sdk-token/<int:verification_id>', methods=['GET'])
 @jwt_required()
+@rate_limit_sensitive  # SDK token generation is sensitive
 def get_sdk_token(verification_id: int):
     """Generate a new SDK token for an existing verification"""
     try:

@@ -4,12 +4,18 @@ Author: Sowad Al-Mughni
 
 Centralized configuration with environment variable support
 and validation for production readiness.
+
+Security Features (OWASP):
+- Fail-fast validation for missing secrets in production
+- No hardcoded secrets or fallbacks in production
+- Secure defaults for rate limiting and session management
 """
 
 import os
 import sys
 from datetime import timedelta
 from dotenv import load_dotenv
+import secrets
 
 # Load environment variables from .env file
 load_dotenv()
@@ -21,14 +27,34 @@ class ConfigurationError(Exception):
 
 
 class Config:
-    """Base configuration class with validation"""
+    """
+    Base configuration class with security-focused validation.
+    
+    OWASP A05:2021 - Security Misconfiguration Prevention:
+    - All secrets must be provided via environment variables
+    - No default/fallback secrets in production
+    - Strict validation on startup
+    """
+    
+    # ==========================================
+    # ENVIRONMENT
+    # ==========================================
+    
+    FLASK_ENV = os.environ.get('FLASK_ENV', 'development')
+    DEBUG = os.environ.get('FLASK_DEBUG', 'True').lower() in ('true', '1', 'yes')
+    HOST = os.environ.get('HOST', '0.0.0.0')
+    PORT = int(os.environ.get('PORT', 5000))
     
     # ==========================================
     # SECURITY SETTINGS
     # ==========================================
     
+    # CRITICAL: These must be set via environment variables in production
     SECRET_KEY = os.environ.get('SECRET_KEY')
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
+    
+    # Minimum secret key length (OWASP recommendation: 256 bits = 32 bytes)
+    MIN_SECRET_LENGTH = 32
     
     # ==========================================
     # JWT CONFIGURATION
@@ -67,10 +93,16 @@ class Config:
     # RATE LIMITING
     # ==========================================
     
+    # Redis recommended for production (multi-instance support)
     RATELIMIT_STORAGE_URL = os.environ.get('RATELIMIT_STORAGE_URL', 'memory://')
+    
+    # Rate limit defaults (conservative for security)
     RATELIMIT_DEFAULT = os.environ.get('RATELIMIT_DEFAULT', '1000 per minute')
-    RATELIMIT_AUTH = os.environ.get('RATELIMIT_AUTH', '100 per minute')
-    RATELIMIT_WRITE = os.environ.get('RATELIMIT_WRITE', '50 per minute')
+    RATELIMIT_AUTH = os.environ.get('RATELIMIT_AUTH', '20 per minute')  # Stricter for auth
+    RATELIMIT_WRITE = os.environ.get('RATELIMIT_WRITE', '30 per minute')
+    RATELIMIT_READ = os.environ.get('RATELIMIT_READ', '200 per minute')
+    RATELIMIT_PUBLIC = os.environ.get('RATELIMIT_PUBLIC', '60 per minute')
+    RATELIMIT_SENSITIVE = os.environ.get('RATELIMIT_SENSITIVE', '5 per minute')
     RATELIMIT_HEADERS_ENABLED = True
     RATELIMIT_STRATEGY = 'fixed-window'
     
@@ -135,49 +167,122 @@ class Config:
     CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379/1')
     CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://localhost:6379/2')
     
-    # ==========================================
-    # ENVIRONMENT
-    # ==========================================
-    
-    FLASK_ENV = os.environ.get('FLASK_ENV', 'development')
-    DEBUG = os.environ.get('FLASK_DEBUG', 'True').lower() in ('true', '1', 'yes')
-    HOST = os.environ.get('HOST', '0.0.0.0')
-    PORT = int(os.environ.get('PORT', 5000))
+    @classmethod
+    def _is_weak_secret(cls, secret: str) -> bool:
+        """
+        Check if a secret is weak or a known placeholder.
+        
+        OWASP: Detect common weak secrets and placeholders
+        """
+        if not secret:
+            return True
+        
+        # Check minimum length
+        if len(secret) < cls.MIN_SECRET_LENGTH:
+            return True
+        
+        # Known weak/placeholder secrets
+        weak_secrets = [
+            'your-super-secret-key',
+            'your-jwt-secret-key',
+            'dev-secret-key',
+            'change-me',
+            'secret',
+            'password',
+            'test-key',
+            'development',
+            '1234567890',
+        ]
+        
+        secret_lower = secret.lower()
+        for weak in weak_secrets:
+            if weak in secret_lower:
+                return True
+        
+        return False
     
     @classmethod
     def validate(cls):
-        """Validate critical configuration settings"""
-        errors = []
+        """
+        Validate critical configuration settings.
         
-        # Check for required secrets in production
+        OWASP: Fail-fast validation prevents running with insecure config
+        """
+        errors = []
+        warnings = []
+        
+        # ==========================================
+        # PRODUCTION VALIDATION
+        # ==========================================
+        
         if cls.FLASK_ENV == 'production':
+            # SECRET_KEY is mandatory and must be strong
             if not cls.SECRET_KEY:
-                errors.append("SECRET_KEY is required in production")
-            elif cls.SECRET_KEY == 'your-super-secret-key-change-in-production':
-                errors.append("SECRET_KEY must be changed from default in production")
+                errors.append("SECRET_KEY is required in production. Set via environment variable.")
+            elif cls._is_weak_secret(cls.SECRET_KEY):
+                errors.append(
+                    f"SECRET_KEY is too weak. Must be at least {cls.MIN_SECRET_LENGTH} characters "
+                    "and not contain common placeholder text."
+                )
             
+            # JWT_SECRET_KEY is mandatory and must be strong
             if not cls.JWT_SECRET_KEY:
-                errors.append("JWT_SECRET_KEY is required in production")
-            elif cls.JWT_SECRET_KEY == 'your-jwt-secret-key-change-in-production':
-                errors.append("JWT_SECRET_KEY must be changed from default in production")
+                errors.append("JWT_SECRET_KEY is required in production. Set via environment variable.")
+            elif cls._is_weak_secret(cls.JWT_SECRET_KEY):
+                errors.append(
+                    f"JWT_SECRET_KEY is too weak. Must be at least {cls.MIN_SECRET_LENGTH} characters "
+                    "and not contain common placeholder text."
+                )
             
+            # SECRET_KEY and JWT_SECRET_KEY should be different
+            if cls.SECRET_KEY and cls.JWT_SECRET_KEY and cls.SECRET_KEY == cls.JWT_SECRET_KEY:
+                warnings.append("SECRET_KEY and JWT_SECRET_KEY should be different for defense in depth.")
+            
+            # Debug must be disabled
             if cls.DEBUG:
                 errors.append("DEBUG must be False in production")
+            
+            # Redis should be used for rate limiting in production
+            if 'memory://' in cls.RATELIMIT_STORAGE_URL:
+                warnings.append(
+                    "SECURITY: In-memory rate limiting in production is not recommended. "
+                    "Use Redis (RATELIMIT_STORAGE_URL=redis://...) for multi-instance deployments."
+                )
+            
+            # SQLite should not be used in production
+            if 'sqlite' in cls.SQLALCHEMY_DATABASE_URI.lower():
+                warnings.append("SQLite is not recommended for production. Use PostgreSQL or MySQL.")
         
-        # Ensure secrets are set (with fallback for development)
-        if not cls.SECRET_KEY:
-            if cls.FLASK_ENV == 'development':
-                cls.SECRET_KEY = 'dev-secret-key-not-for-production'
-                print("WARNING: Using default SECRET_KEY. Set SECRET_KEY in .env for production.", file=sys.stderr)
-            else:
-                errors.append("SECRET_KEY must be set")
+        # ==========================================
+        # DEVELOPMENT FALLBACKS
+        # ==========================================
         
-        if not cls.JWT_SECRET_KEY:
-            cls.JWT_SECRET_KEY = cls.SECRET_KEY
+        if cls.FLASK_ENV != 'production':
+            # Generate secure development secrets if not provided
+            if not cls.SECRET_KEY:
+                cls.SECRET_KEY = f'dev-{secrets.token_hex(32)}'
+                print(
+                    "WARNING: Generated temporary SECRET_KEY for development. "
+                    "Set SECRET_KEY in .env for production.",
+                    file=sys.stderr
+                )
+            
+            if not cls.JWT_SECRET_KEY:
+                cls.JWT_SECRET_KEY = cls.SECRET_KEY
         
+        # ==========================================
+        # OUTPUT RESULTS
+        # ==========================================
+        
+        # Print warnings
+        for warning in warnings:
+            print(f"WARNING: {warning}", file=sys.stderr)
+        
+        # Fail on errors
         if errors:
             raise ConfigurationError(
-                "Configuration validation failed:\n" + "\n".join(f"  - {e}" for e in errors)
+                "Configuration validation failed:\n" + 
+                "\n".join(f"  ✗ {e}" for e in errors)
             )
         
         return True

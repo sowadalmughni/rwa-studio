@@ -3,6 +3,11 @@ Billing Routes for RWA-Studio
 Author: Sowad Al-Mughni
 
 Stripe Payment Gateway API Endpoints
+
+Security:
+- Rate limiting on all endpoints
+- Sensitive operations (payment) have strict limits
+- Webhook signature verification
 """
 
 from flask import Blueprint, request, jsonify, redirect
@@ -14,6 +19,7 @@ from src.models.user import db, User
 from src.models.subscription import Subscription, BillingHistory
 from src.services.payments import get_payment_service, SubscriptionPlan, SubscriptionStatus
 from src.tasks.email_tasks import send_subscription_email
+from src.middleware.rate_limit import rate_limit_read, rate_limit_write, rate_limit_sensitive, rate_limit_public
 
 logger = structlog.get_logger()
 
@@ -21,6 +27,7 @@ billing_bp = Blueprint('billing', __name__, url_prefix='/api/billing')
 
 
 @billing_bp.route('/plans', methods=['GET'])
+@rate_limit_public  # Public endpoint to view plans
 def get_plans():
     """Get available subscription plans"""
     plans = [
@@ -79,6 +86,7 @@ def get_plans():
 
 @billing_bp.route('/subscription', methods=['GET'])
 @jwt_required()
+@rate_limit_read  # User's own subscription data
 def get_subscription():
     """Get current user's subscription"""
     try:
@@ -108,6 +116,7 @@ def get_subscription():
 
 @billing_bp.route('/checkout', methods=['POST'])
 @jwt_required()
+@rate_limit_sensitive  # Payment operations are sensitive
 def create_checkout():
     """
     Create a Stripe checkout session
@@ -211,6 +220,7 @@ def create_checkout():
 
 @billing_bp.route('/cancel', methods=['POST'])
 @jwt_required()
+@rate_limit_sensitive  # Subscription cancellation is sensitive
 def cancel_subscription():
     """Cancel current subscription"""
     try:
@@ -279,6 +289,7 @@ def cancel_subscription():
 
 @billing_bp.route('/invoices', methods=['GET'])
 @jwt_required()
+@rate_limit_read  # Reading invoices
 def get_invoices():
     """Get billing history/invoices"""
     try:
@@ -333,6 +344,7 @@ def get_invoices():
 
 
 @billing_bp.route('/webhook', methods=['POST'])
+@rate_limit_write  # Webhook from payment provider
 def webhook():
     """
     Handle Stripe webhooks
@@ -531,6 +543,7 @@ def _handle_payment_failed(data: dict):
 
 @billing_bp.route('/usage', methods=['GET'])
 @jwt_required()
+@rate_limit_read  # Usage stats
 def get_usage():
     """Get current usage statistics"""
     try:

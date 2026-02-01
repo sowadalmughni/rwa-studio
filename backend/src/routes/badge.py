@@ -3,11 +3,17 @@ Embeddable Badge API Routes for RWA-Studio
 Author: Sowad Al-Mughni
 
 SVG badge generation with aggressive caching for viral growth.
+
+Security:
+- Rate limiting on all endpoints
+- Input sanitization for badge parameters
 """
 
 from flask import Blueprint, Response, request, jsonify
 from datetime import datetime
 from src.models.token import db, TokenDeployment
+from src.middleware.rate_limit import rate_limit_public
+from src.middleware.validation import is_valid_ethereum_address, sanitize_string
 
 badge_bp = Blueprint('badge', __name__)
 
@@ -147,6 +153,7 @@ def generate_token_badge_svg(token, badge_type='full', style='flat'):
 
 
 @badge_bp.route('/<token_address>.svg', methods=['GET'])
+@rate_limit_public  # Public badge generation - heavily cached
 def get_badge_svg(token_address):
     """
     Generate SVG badge for a token
@@ -155,8 +162,12 @@ def get_badge_svg(token_address):
     - type: 'simple', 'token', 'full' (default: 'full')
     - style: 'flat', 'flat-square', 'plastic', 'for-the-badge' (default: 'flat')
     """
-    badge_type = request.args.get('type', 'full')
-    style = request.args.get('style', 'flat')
+    # Validate token address format
+    if not is_valid_ethereum_address(token_address):
+        return Response("Invalid token address", status=400, mimetype='text/plain')
+    
+    badge_type = sanitize_string(request.args.get('type', 'full'), max_length=20)
+    style = sanitize_string(request.args.get('style', 'flat'), max_length=20)
     
     # Validate style
     if style not in BADGE_STYLES:
@@ -180,10 +191,14 @@ def get_badge_svg(token_address):
 
 
 @badge_bp.route('/embed/<token_address>', methods=['GET'])
+@rate_limit_public  # Public embed code
 def get_embed_code(token_address):
     """
     Get embeddable HTML/Markdown code for a token badge
     """
+    if not is_valid_ethereum_address(token_address):
+        return jsonify({'success': False, 'error': 'Invalid token address'}), 400
+    
     token = TokenDeployment.query.filter_by(token_address=token_address).first()
     
     if not token:
@@ -230,6 +245,7 @@ def get_embed_code(token_address):
 
 
 @badge_bp.route('/preview', methods=['GET'])
+@rate_limit_public  # Public preview
 def preview_badges():
     """
     Preview all badge styles (for documentation)
@@ -257,6 +273,7 @@ def preview_badges():
 
 
 @badge_bp.route('/types', methods=['GET'])
+@rate_limit_public  # Public badge types
 def get_badge_types():
     """Get all available badge types and their configurations"""
     return jsonify({

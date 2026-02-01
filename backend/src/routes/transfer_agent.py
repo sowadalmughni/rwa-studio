@@ -1,6 +1,11 @@
 """
 Transfer Agent Console API Routes for RWA-Studio
 Author: Sowad Al-Mughni
+
+Security Features (OWASP):
+- Rate limiting on all endpoints
+- Schema-based input validation
+- Role-based access control (transfer_agent role required for writes)
 """
 
 from flask import Blueprint, request, jsonify
@@ -12,6 +17,12 @@ from src.models.token import (
     TransferAgentUser, TokenMetrics
 )
 from src.middleware.auth import transfer_agent_required, admin_required
+from src.middleware.rate_limit import rate_limit_read, rate_limit_write, rate_limit_public
+from src.middleware.validation import (
+    validate_request, validate_query_params, PAGINATION_SCHEMA,
+    TOKEN_REGISTER_SCHEMA, ADDRESS_VERIFY_SCHEMA, COMPLIANCE_EVENT_SCHEMA,
+    is_valid_ethereum_address, sanitize_string, sanitize_html
+)
 import json
 
 transfer_agent_bp = Blueprint('transfer_agent', __name__)
@@ -20,14 +31,28 @@ transfer_agent_bp = Blueprint('transfer_agent', __name__)
 
 @transfer_agent_bp.route('/tokens', methods=['GET'])
 @jwt_required()
-def get_tokens():
+@rate_limit_read
+@validate_query_params(PAGINATION_SCHEMA)
+def get_tokens(validated_params):
     """Get all token deployments with pagination and filtering"""
     try:
-        page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 20, type=int)
+        page = validated_params.get('page', 1)
+        per_page = validated_params.get('per_page', 20)
+        
+        # Get optional filters from query params (validated separately)
         asset_type = request.args.get('asset_type')
         regulatory_framework = request.args.get('regulatory_framework')
         is_active = request.args.get('is_active', type=bool)
+        
+        # Validate filter values if provided
+        valid_asset_types = ['real_estate', 'equity', 'debt', 'commodity', 'art', 'other']
+        valid_frameworks = ['reg_d', 'reg_s', 'reg_a', 'reg_cf', 'mifid_ii', 'other']
+        
+        if asset_type and asset_type not in valid_asset_types:
+            return jsonify({'success': False, 'error': f'Invalid asset_type. Must be one of: {valid_asset_types}'}), 400
+        
+        if regulatory_framework and regulatory_framework not in valid_frameworks:
+            return jsonify({'success': False, 'error': f'Invalid regulatory_framework. Must be one of: {valid_frameworks}'}), 400
         
         query = TokenDeployment.query
         
@@ -63,14 +88,19 @@ def get_tokens():
         })
         
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return jsonify({'success': False, 'error': 'Failed to fetch tokens'}), 500
 
 @transfer_agent_bp.route('/tokens/<token_address>', methods=['GET'])
 @jwt_required()
+@rate_limit_read
 def get_token_details(token_address):
     """Get detailed information about a specific token"""
     try:
-        token = TokenDeployment.query.filter_by(token_address=token_address).first()
+        # Validate token address format
+        if not is_valid_ethereum_address(token_address):
+            return jsonify({'success': False, 'error': 'Invalid token address format'}), 400
+        
+        token = TokenDeployment.query.filter_by(token_address=token_address.lower()).first()
         if not token:
             return jsonify({'success': False, 'error': 'Token not found'}), 404
         
@@ -106,30 +136,26 @@ def get_token_details(token_address):
         })
         
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return jsonify({'success': False, 'error': 'Failed to fetch token details'}), 500
 
 @transfer_agent_bp.route('/tokens', methods=['POST'])
 @jwt_required()
 @transfer_agent_required()
-def register_token():
-    """Register a new token deployment"""
+@rate_limit_write
+@validate_request(TOKEN_REGISTER_SCHEMA)
+def register_token(validated_data):
+    """
+    Register a new token deployment.
+    
+    Requires: transfer_agent role
+    Rate limit: 30 requests/minute
+    """
     try:
-        data = request.get_json()
-        
-        # Validate required fields
-        required_fields = [
-            'token_address', 'token_name', 'token_symbol', 'asset_type',
-            'regulatory_framework', 'jurisdiction', 'max_supply', 'deployer_address',
-            'compliance_address', 'identity_registry_address'
-        ]
-        
-        for field in required_fields:
-            if field not in data:
-                return jsonify({'success': False, 'error': f'Missing required field: {field}'}), 400
+        token_address = validated_data['token_address'].lower()
         
         # Check if token already exists
         existing_token = TokenDeployment.query.filter_by(
-            token_address=data['token_address']
+            token_address=token_address
         ).first()
         
         if existing_token:
@@ -137,19 +163,19 @@ def register_token():
         
         # Create new token deployment record
         token = TokenDeployment(
-            token_address=data['token_address'],
-            token_name=data['token_name'],
-            token_symbol=data['token_symbol'],
-            asset_type=data['asset_type'],
-            regulatory_framework=data['regulatory_framework'],
-            jurisdiction=data['jurisdiction'],
-            max_supply=data['max_supply'],
-            deployer_address=data['deployer_address'],
-            compliance_address=data['compliance_address'],
-            identity_registry_address=data['identity_registry_address'],
-            deployment_tx_hash=data.get('deployment_tx_hash'),
-            description=data.get('description'),
-            document_hash=data.get('document_hash')
+            token_address=token_address,
+            token_name=validated_data['token_name'],
+            token_symbol=validated_data['token_symbol'].upper(),
+            asset_type=validated_data['asset_type'],
+            regulatory_framework=validated_data['regulatory_framework'],
+            jurisdiction=validated_data['jurisdiction'],
+            max_supply=validated_data['max_supply'],
+            deployer_address=validated_data['deployer_address'].lower(),
+            compliance_address=validated_data['compliance_address'].lower(),
+            identity_registry_address=validated_data['identity_registry_address'].lower(),
+            deployment_tx_hash=validated_data.get('deployment_tx_hash'),
+            description=validated_data.get('description'),  # Already sanitized by schema
+            document_hash=validated_data.get('document_hash')
         )
         
         db.session.add(token)
@@ -162,23 +188,36 @@ def register_token():
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return jsonify({'success': False, 'error': 'Failed to register token'}), 500
 
 # Identity Verification Endpoints
 
 @transfer_agent_bp.route('/tokens/<token_address>/verified-addresses', methods=['GET'])
 @jwt_required()
-def get_verified_addresses(token_address):
+@rate_limit_read
+@validate_query_params(PAGINATION_SCHEMA)
+def get_verified_addresses(token_address, validated_params):
     """Get verified addresses for a token"""
     try:
-        token = TokenDeployment.query.filter_by(token_address=token_address).first()
+        # Validate token address
+        if not is_valid_ethereum_address(token_address):
+            return jsonify({'success': False, 'error': 'Invalid token address format'}), 400
+        
+        token = TokenDeployment.query.filter_by(token_address=token_address.lower()).first()
         if not token:
             return jsonify({'success': False, 'error': 'Token not found'}), 404
         
-        page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 50, type=int)
+        page = validated_params.get('page', 1)
+        per_page = min(validated_params.get('per_page', 50), 100)  # Cap at 100
+        
+        # Get optional filters
         verification_level = request.args.get('verification_level')
         is_active = request.args.get('is_active', type=bool)
+        
+        # Validate verification_level
+        valid_levels = ['basic', 'accredited', 'institutional']
+        if verification_level and verification_level not in valid_levels:
+            return jsonify({'success': False, 'error': f'Invalid verification_level. Must be one of: {valid_levels}'}), 400
         
         query = VerifiedAddress.query.filter_by(token_deployment_id=token.id)
         
@@ -212,34 +251,35 @@ def get_verified_addresses(token_address):
         })
         
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return jsonify({'success': False, 'error': 'Failed to fetch verified addresses'}), 500
 
 @transfer_agent_bp.route('/tokens/<token_address>/verified-addresses', methods=['POST'])
 @jwt_required()
 @transfer_agent_required()
-def add_verified_address(token_address):
-    """Add a verified address to a token"""
+@rate_limit_write
+@validate_request(ADDRESS_VERIFY_SCHEMA)
+def add_verified_address(token_address, validated_data):
+    """
+    Add a verified address to a token.
+    
+    Requires: transfer_agent role
+    Rate limit: 30 requests/minute
+    """
     try:
-        token = TokenDeployment.query.filter_by(token_address=token_address).first()
+        # Validate token address
+        if not is_valid_ethereum_address(token_address):
+            return jsonify({'success': False, 'error': 'Invalid token address format'}), 400
+        
+        token = TokenDeployment.query.filter_by(token_address=token_address.lower()).first()
         if not token:
             return jsonify({'success': False, 'error': 'Token not found'}), 404
         
-        data = request.get_json()
-        
-        # Validate required fields
-        required_fields = [
-            'address', 'verification_level', 'jurisdiction', 
-            'expiration_date', 'identity_hash'
-        ]
-        
-        for field in required_fields:
-            if field not in data:
-                return jsonify({'success': False, 'error': f'Missing required field: {field}'}), 400
+        investor_address = validated_data['address'].lower()
         
         # Check if address already verified for this token
         existing_address = VerifiedAddress.query.filter_by(
             token_deployment_id=token.id,
-            address=data['address']
+            address=investor_address
         ).first()
         
         if existing_address:
@@ -247,20 +287,22 @@ def add_verified_address(token_address):
         
         # Parse expiration date
         try:
-            expiration_date = datetime.fromisoformat(data['expiration_date'].replace('Z', '+00:00'))
-        except ValueError:
-            return jsonify({'success': False, 'error': 'Invalid expiration_date format'}), 400
+            expiration_date = datetime.fromisoformat(
+                validated_data['expiration_date'].replace('Z', '+00:00')
+            )
+        except (ValueError, AttributeError):
+            return jsonify({'success': False, 'error': 'Invalid expiration_date format. Use ISO 8601.'}), 400
         
         # Create verified address record
         verified_address = VerifiedAddress(
             token_deployment_id=token.id,
-            address=data['address'],
-            verification_level=data['verification_level'],
-            jurisdiction=data['jurisdiction'],
+            address=investor_address,
+            verification_level=validated_data['verification_level'],
+            jurisdiction=validated_data['jurisdiction'],
             expiration_date=expiration_date,
-            identity_hash=data['identity_hash'],
-            kyc_provider=data.get('kyc_provider'),
-            notes=data.get('notes')
+            identity_hash=validated_data['identity_hash'],
+            kyc_provider=validated_data.get('kyc_provider'),
+            notes=validated_data.get('notes')  # Already sanitized by schema
         )
         
         db.session.add(verified_address)
@@ -273,38 +315,55 @@ def add_verified_address(token_address):
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return jsonify({'success': False, 'error': 'Failed to add verified address'}), 500
 
 @transfer_agent_bp.route('/verified-addresses/<int:address_id>', methods=['PUT'])
 @jwt_required()
 @transfer_agent_required()
+@rate_limit_write
 def update_verified_address(address_id):
-    """Update a verified address"""
+    """
+    Update a verified address.
+    
+    Requires: transfer_agent role
+    Rate limit: 30 requests/minute
+    """
     try:
         verified_address = VerifiedAddress.query.get(address_id)
         if not verified_address:
             return jsonify({'success': False, 'error': 'Verified address not found'}), 404
         
         data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'Request body required'}), 400
         
-        # Update allowed fields
+        # Validate and update allowed fields
+        valid_levels = ['basic', 'accredited', 'institutional']
+        
         if 'verification_level' in data:
+            if data['verification_level'] not in valid_levels:
+                return jsonify({'success': False, 'error': f'Invalid verification_level. Must be one of: {valid_levels}'}), 400
             verified_address.verification_level = data['verification_level']
+        
         if 'jurisdiction' in data:
-            verified_address.jurisdiction = data['jurisdiction']
+            verified_address.jurisdiction = sanitize_string(data['jurisdiction'], max_length=100)
+        
         if 'expiration_date' in data:
             try:
                 verified_address.expiration_date = datetime.fromisoformat(
                     data['expiration_date'].replace('Z', '+00:00')
                 )
-            except ValueError:
+            except (ValueError, AttributeError):
                 return jsonify({'success': False, 'error': 'Invalid expiration_date format'}), 400
+        
         if 'kyc_provider' in data:
-            verified_address.kyc_provider = data['kyc_provider']
+            verified_address.kyc_provider = sanitize_string(data['kyc_provider'], max_length=100)
+        
         if 'is_active' in data:
-            verified_address.is_active = data['is_active']
+            verified_address.is_active = bool(data['is_active'])
+        
         if 'notes' in data:
-            verified_address.notes = data['notes']
+            verified_address.notes = sanitize_html(sanitize_string(data['notes'], max_length=2000))
         
         db.session.commit()
         
@@ -315,23 +374,41 @@ def update_verified_address(address_id):
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return jsonify({'success': False, 'error': 'Failed to update verified address'}), 500
 
 # Compliance Monitoring Endpoints
 
 @transfer_agent_bp.route('/tokens/<token_address>/compliance-events', methods=['GET'])
-def get_compliance_events(token_address):
-    """Get compliance events for a token"""
+@rate_limit_public
+@validate_query_params(PAGINATION_SCHEMA)
+def get_compliance_events(token_address, validated_params):
+    """Get compliance events for a token (public endpoint)"""
     try:
-        token = TokenDeployment.query.filter_by(token_address=token_address).first()
+        # Validate token address
+        if not is_valid_ethereum_address(token_address):
+            return jsonify({'success': False, 'error': 'Invalid token address format'}), 400
+        
+        token = TokenDeployment.query.filter_by(token_address=token_address.lower()).first()
         if not token:
             return jsonify({'success': False, 'error': 'Token not found'}), 404
         
-        page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 50, type=int)
+        page = validated_params.get('page', 1)
+        per_page = min(validated_params.get('per_page', 50), 100)
+        
+        # Get optional filters
         event_type = request.args.get('event_type')
         severity = request.args.get('severity')
         resolved = request.args.get('resolved', type=bool)
+        
+        # Validate filter values
+        valid_event_types = ['transfer_blocked', 'compliance_check', 'verification_expired', 'limit_exceeded', 'jurisdiction_violation']
+        valid_severities = ['info', 'warning', 'critical']
+        
+        if event_type and event_type not in valid_event_types:
+            return jsonify({'success': False, 'error': f'Invalid event_type. Must be one of: {valid_event_types}'}), 400
+        
+        if severity and severity not in valid_severities:
+            return jsonify({'success': False, 'error': f'Invalid severity. Must be one of: {valid_severities}'}), 400
         
         query = ComplianceEvent.query.filter_by(token_deployment_id=token.id)
         
@@ -367,40 +444,40 @@ def get_compliance_events(token_address):
         })
         
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return jsonify({'success': False, 'error': 'Failed to fetch compliance events'}), 500
 
 @transfer_agent_bp.route('/compliance-events', methods=['POST'])
 @jwt_required()
 @transfer_agent_required()
-def log_compliance_event():
-    """Log a new compliance event"""
+@rate_limit_write
+@validate_request(COMPLIANCE_EVENT_SCHEMA)
+def log_compliance_event(validated_data):
+    """
+    Log a new compliance event.
+    
+    Requires: transfer_agent role
+    Rate limit: 30 requests/minute
+    """
     try:
-        data = request.get_json()
-        
-        # Validate required fields
-        required_fields = ['token_address', 'event_type', 'reason']
-        
-        for field in required_fields:
-            if field not in data:
-                return jsonify({'success': False, 'error': f'Missing required field: {field}'}), 400
-        
         # Find token
-        token = TokenDeployment.query.filter_by(token_address=data['token_address']).first()
+        token = TokenDeployment.query.filter_by(
+            token_address=validated_data['token_address'].lower()
+        ).first()
         if not token:
             return jsonify({'success': False, 'error': 'Token not found'}), 404
         
         # Create compliance event
         event = ComplianceEvent(
             token_deployment_id=token.id,
-            event_type=data['event_type'],
-            from_address=data.get('from_address'),
-            to_address=data.get('to_address'),
-            amount=data.get('amount'),
-            reason=data['reason'],
-            transaction_hash=data.get('transaction_hash'),
-            block_number=data.get('block_number'),
-            severity=data.get('severity', 'info'),
-            event_metadata=json.dumps(data.get('metadata')) if data.get('metadata') else None
+            event_type=validated_data['event_type'],
+            from_address=validated_data.get('from_address', '').lower() if validated_data.get('from_address') else None,
+            to_address=validated_data.get('to_address', '').lower() if validated_data.get('to_address') else None,
+            amount=validated_data.get('amount'),
+            reason=validated_data['reason'],
+            transaction_hash=validated_data.get('transaction_hash'),
+            block_number=validated_data.get('block_number'),
+            severity=validated_data.get('severity', 'info'),
+            event_metadata=json.dumps(validated_data.get('metadata')) if validated_data.get('metadata') else None
         )
         
         db.session.add(event)
@@ -413,22 +490,28 @@ def log_compliance_event():
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return jsonify({'success': False, 'error': 'Failed to log compliance event'}), 500
 
 @transfer_agent_bp.route('/compliance-events/<int:event_id>/resolve', methods=['PUT'])
 @jwt_required()
 @transfer_agent_required()
+@rate_limit_write
 def resolve_compliance_event(event_id):
-    """Mark a compliance event as resolved"""
+    """
+    Mark a compliance event as resolved.
+    
+    Requires: transfer_agent role
+    Rate limit: 30 requests/minute
+    """
     try:
         event = ComplianceEvent.query.get(event_id)
         if not event:
             return jsonify({'success': False, 'error': 'Compliance event not found'}), 404
         
-        data = request.get_json()
+        data = request.get_json() or {}
         
         event.resolved = True
-        event.resolved_by = data.get('resolved_by')
+        event.resolved_by = sanitize_string(data.get('resolved_by', ''), max_length=100) or None
         event.resolved_date = datetime.utcnow()
         
         db.session.commit()
@@ -440,19 +523,27 @@ def resolve_compliance_event(event_id):
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return jsonify({'success': False, 'error': 'Failed to resolve compliance event'}), 500
 
 # Analytics and Reporting Endpoints
 
 @transfer_agent_bp.route('/tokens/<token_address>/metrics', methods=['GET'])
+@rate_limit_public
 def get_token_metrics(token_address):
-    """Get metrics and analytics for a token"""
+    """Get metrics and analytics for a token (public endpoint)"""
     try:
-        token = TokenDeployment.query.filter_by(token_address=token_address).first()
+        # Validate token address
+        if not is_valid_ethereum_address(token_address):
+            return jsonify({'success': False, 'error': 'Invalid token address format'}), 400
+        
+        token = TokenDeployment.query.filter_by(token_address=token_address.lower()).first()
         if not token:
             return jsonify({'success': False, 'error': 'Token not found'}), 404
         
+        # Validate and constrain days parameter
         days = request.args.get('days', 30, type=int)
+        days = max(1, min(days, 365))  # Constrain to 1-365 days
+        
         start_date = datetime.utcnow().date() - timedelta(days=days)
         
         # Get metrics for the specified period
@@ -490,11 +581,12 @@ def get_token_metrics(token_address):
         })
         
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return jsonify({'success': False, 'error': 'Failed to fetch token metrics'}), 500
 
 @transfer_agent_bp.route('/dashboard/overview', methods=['GET'])
+@rate_limit_public
 def get_dashboard_overview():
-    """Get overview data for the transfer agent dashboard"""
+    """Get overview data for the transfer agent dashboard (public endpoint)"""
     try:
         # Get total counts
         total_tokens = TokenDeployment.query.filter_by(is_active=True).count()
@@ -545,7 +637,7 @@ def get_dashboard_overview():
         })
         
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return jsonify({'success': False, 'error': 'Failed to fetch dashboard overview'}), 500
 
 # Health check endpoint
 @transfer_agent_bp.route('/health', methods=['GET'])

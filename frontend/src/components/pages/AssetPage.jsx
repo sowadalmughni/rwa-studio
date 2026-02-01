@@ -4,7 +4,7 @@
  * Displays token information publicly with sharing and referral support
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -51,11 +51,7 @@ export function AssetPage() {
   const refCode = searchParams.get("ref");
   const utmSource = searchParams.get("utm_source");
 
-  useEffect(() => {
-    loadAssetData();
-  }, [tokenAddress]);
-
-  const loadAssetData = async () => {
+  const loadAssetData = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -80,7 +76,11 @@ export function AssetPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [tokenAddress, refCode, utmSource]);
+
+  useEffect(() => {
+    loadAssetData();
+  }, [loadAssetData]);
 
   if (loading) {
     return <AssetPageSkeleton />;
@@ -105,7 +105,7 @@ export function AssetPage() {
     );
   }
 
-  const { token, stats, badges, share_urls, embed_codes } = pageData;
+  const { token, stats, badges, share_urls: _share_urls, embed_codes: _embed_codes } = pageData;
   const framework = token.regulatory_framework?.toLowerCase().replace(" ", "-") || "custom";
   const frameworkColors = FRAMEWORK_COLORS[framework] || FRAMEWORK_COLORS.custom;
   const AssetIcon = ASSET_ICONS[token.asset_type] || Building;

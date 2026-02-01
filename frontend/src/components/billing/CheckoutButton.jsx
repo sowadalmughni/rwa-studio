@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 // Initialize Stripe (use environment variable in production)
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "");
+// TODO: Use stripePromise when implementing full Stripe Elements checkout
+const _stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "");
 
 export function CheckoutButton({
   plan,

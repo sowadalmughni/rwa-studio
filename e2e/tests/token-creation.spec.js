@@ -11,7 +11,7 @@ import { test, expect } from "@playwright/test";
 // Skip these tests if not in a proper authenticated environment
 test.describe("Token Creation Workflow", () => {
   test.skip(
-    ({ browserName }) => !process.env.E2E_AUTHENTICATED,
+    ({ browserName: _browserName }) => !process.env.E2E_AUTHENTICATED,
     "Skipping - requires authenticated session"
   );
 
@@ -62,7 +62,7 @@ test.describe("Token Templates", () => {
     await page.waitForLoadState("networkidle");
 
     // Look for template-related content
-    const templateContent = page.locator(
+    const _templateContent = page.locator(
       '[data-testid="templates"], .templates, [class*="template"]'
     );
 

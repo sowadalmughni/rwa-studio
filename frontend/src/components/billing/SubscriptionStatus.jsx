@@ -60,7 +60,7 @@ export function SubscriptionStatus({ subscription, onRefresh }) {
 
       toast.success("Subscription will be canceled at the end of the billing period");
       onRefresh?.();
-    } catch (error) {
+    } catch {
       toast.error("Failed to cancel subscription");
     } finally {
       setCanceling(false);

@@ -72,7 +72,7 @@ const plans = [
   },
 ];
 
-export function PricingPlans({ currentPlan, onSelectPlan }) {
+export function PricingPlans({ currentPlan, onSelectPlan: _onSelectPlan }) {
   const [loading, setLoading] = useState(null);
 
   const handleContactSales = () => {

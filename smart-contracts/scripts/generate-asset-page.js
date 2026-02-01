@@ -74,7 +74,7 @@ async function generateAssetPage(taskArgs, hre) {
           if (isActive) {
             complianceRules.push(description);
           }
-        } catch (e) {
+        } catch {
           // Skip rules that can't be queried
         }
       }
@@ -225,7 +225,7 @@ function generateBadges(framework, hasCompliance) {
   return badges;
 }
 
-function generateHTML(data, template) {
+function generateHTML(data, _template) {
   const { token, asset, compliance, network, generatedAt } = data;
 
   // Generate badge HTML

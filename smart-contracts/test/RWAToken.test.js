@@ -190,7 +190,7 @@ describe("RWAToken", function () {
     });
 
     it("Should get compliance status", async function () {
-      const [isCompliant, status, lastUpdate] = await rwaToken.getComplianceStatus(addr1.address);
+      const [isCompliant, status, _lastUpdate] = await rwaToken.getComplianceStatus(addr1.address);
       expect(isCompliant).to.equal(true);
       expect(status).to.equal("No compliance issues");
     });

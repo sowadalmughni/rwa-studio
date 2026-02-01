@@ -72,7 +72,7 @@ async function generateComplianceReport(taskArgs, hre) {
             isActive: isActive,
             parameters: params,
           });
-        } catch (e) {
+        } catch {
           complianceInfo.rules.push({
             address: ruleAddress,
             description: "Unable to query",
@@ -102,7 +102,7 @@ async function generateComplianceReport(taskArgs, hre) {
         identityInfo.verifiedAddressCount = Number(
           await identityRegistry.getVerifiedAddressCount()
         );
-      } catch (e) {
+      } catch {
         console.log(`   Warning: Could not get verified address count`);
       }
     }

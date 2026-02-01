@@ -4,7 +4,7 @@
  * Allows users to preview and select asset page templates
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -45,13 +45,10 @@ const TEMPLATE_PREVIEWS = {
 export function TemplateSelector({ selectedTemplate, onSelectTemplate, assetType }) {
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
+  // eslint-disable-next-line no-unused-vars
   const [previewTemplate, setPreviewTemplate] = useState(null);
 
-  useEffect(() => {
-    loadTemplates();
-  }, [assetType]);
-
-  const loadTemplates = async () => {
+  const loadTemplates = useCallback(async () => {
     setLoading(true);
     try {
       // In production, fetch from API
@@ -129,7 +126,11 @@ export function TemplateSelector({ selectedTemplate, onSelectTemplate, assetType
     } finally {
       setLoading(false);
     }
-  };
+  }, [assetType]);
+
+  useEffect(() => {
+    loadTemplates();
+  }, [loadTemplates]);
 
   const handleSelect = (templateName) => {
     onSelectTemplate(templateName);

@@ -7,7 +7,7 @@
  */
 
 const { task, subtask } = require("hardhat/config");
-const { TASK_COMPILE } = require("hardhat/builtin-tasks/task-names");
+const { TASK_COMPILE: _TASK_COMPILE } = require("hardhat/builtin-tasks/task-names");
 
 // Plugin configuration
 const PLUGIN_NAME = "hardhat-rwa-studio";
@@ -149,7 +149,7 @@ task("rwa:asset-page", "Generate shareable asset page")
 
 // Subtasks for internal use
 subtask("rwa:validate-params", "Validate RWA deployment parameters").setAction(
-  async (taskArgs, hre) => {
+  async (taskArgs, _hre) => {
     const validAssetTypes = ["real-estate", "funds", "debt", "commodities", "equity", "art"];
     const validFrameworks = ["RegD", "RegS", "RegCF", "RegA"];
     const validJurisdictions = ["US", "EU", "UK", "CA", "AU", "SG"];

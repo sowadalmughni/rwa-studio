@@ -44,7 +44,7 @@ test.describe("Protected Routes", () => {
 
     // Should either redirect to login or show authentication UI
     const url = page.url();
-    const isProtected =
+    const _isProtected =
       !url.includes("/dashboard") ||
       url.includes("/login") ||
       url.includes("/auth") ||

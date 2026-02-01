@@ -22,16 +22,7 @@ import { Badge } from "../ui/badge";
  * Custom ConnectWallet component with RWA-Studio branding
  */
 export function ConnectWallet({ showBalance = true, variant = "default" }) {
-  const {
-    isConnected,
-    isAuthenticated,
-    user,
-    logout,
-    authenticateWithWallet,
-    isAuthenticating,
-    error,
-    shortenedAddress,
-  } = useWallet();
+  const { isAuthenticated, user, logout, authenticateWithWallet, isAuthenticating } = useWallet();
 
   return (
     <ConnectButton.Custom>

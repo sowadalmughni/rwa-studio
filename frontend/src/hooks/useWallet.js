@@ -28,28 +28,17 @@ export function useWallet() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [error, setError] = useState(null);
 
-  // Load user data if token exists
-  useEffect(() => {
-    if (authToken && !user) {
-      fetchCurrentUser();
-    }
-  }, [authToken]);
-
-  // Clear auth when wallet disconnects
-  useEffect(() => {
-    if (!isConnected && authToken) {
-      logout();
-    }
-  }, [isConnected]);
-
   /**
    * Fetch current user data from the API
    */
-  const fetchCurrentUser = async () => {
+  const fetchCurrentUser = useCallback(async () => {
     try {
+      const token = localStorage.getItem("rwa_studio_token");
+      if (!token) return;
+
       const response = await fetch(`${API_BASE_URL}/auth/me`, {
         headers: {
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -59,13 +48,56 @@ export function useWallet() {
           setUser(data.data.user);
         }
       } else {
-        // Token expired or invalid
-        logout();
+        // Token expired or invalid - clear state
+        setAuthToken(null);
+        setUser(null);
+        localStorage.removeItem("rwa_studio_token");
+        localStorage.removeItem("rwa_studio_refresh_token");
       }
     } catch (err) {
       console.error("Failed to fetch user:", err);
     }
-  };
+  }, []);
+
+  /**
+   * Logout and clear session
+   */
+  const logout = useCallback(async () => {
+    const token = localStorage.getItem("rwa_studio_token");
+    try {
+      if (token) {
+        // Notify server about logout
+        await fetch(`${API_BASE_URL}/auth/logout`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+    } catch (err) {
+      console.error("Logout error:", err);
+    } finally {
+      setAuthToken(null);
+      setUser(null);
+      localStorage.removeItem("rwa_studio_token");
+      localStorage.removeItem("rwa_studio_refresh_token");
+      disconnect();
+    }
+  }, [disconnect]);
+
+  // Load user data if token exists
+  useEffect(() => {
+    if (authToken && !user) {
+      fetchCurrentUser();
+    }
+  }, [authToken, user, fetchCurrentUser]);
+
+  // Clear auth when wallet disconnects
+  useEffect(() => {
+    if (!isConnected && authToken) {
+      logout();
+    }
+  }, [isConnected, authToken, logout]);
 
   /**
    * Authenticate with wallet signature
@@ -130,42 +162,17 @@ export function useWallet() {
   }, [isConnected, openConnectModal, authenticateWithWallet]);
 
   /**
-   * Logout and clear session
-   */
-  const logout = useCallback(async () => {
-    try {
-      if (authToken) {
-        // Notify server about logout
-        await fetch(`${API_BASE_URL}/auth/logout`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        });
-      }
-    } catch (err) {
-      console.error("Logout error:", err);
-    } finally {
-      setAuthToken(null);
-      setUser(null);
-      localStorage.removeItem("rwa_studio_token");
-      localStorage.removeItem("rwa_studio_refresh_token");
-      disconnect();
-    }
-  }, [authToken, disconnect]);
-
-  /**
    * Refresh access token
    */
   const refreshToken = useCallback(async () => {
-    const refreshToken = localStorage.getItem("rwa_studio_refresh_token");
-    if (!refreshToken) return null;
+    const storedRefreshToken = localStorage.getItem("rwa_studio_refresh_token");
+    if (!storedRefreshToken) return null;
 
     try {
       const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${refreshToken}`,
+          Authorization: `Bearer ${storedRefreshToken}`,
         },
       });
 

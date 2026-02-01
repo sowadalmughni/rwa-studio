@@ -5,12 +5,13 @@ import { Badge } from '@/components/ui/badge.jsx'
 import { Progress } from '@/components/ui/progress.jsx'
 import { ConnectWallet } from '@/components/wallet'
 import ErrorBoundary from '@/components/ErrorBoundary.jsx'
-import { CheckCircle, Circle, Building, FileText, DollarSign, Users, Rocket } from 'lucide-react'
+import { CheckCircle, Circle, Building, FileText, DollarSign, Users, Rocket, Menu, X } from 'lucide-react'
 import './App.css'
 
 function AppContent() {
   const [currentStep, setCurrentStep] = useState(1)
   const [completedSteps, setCompletedSteps] = useState([])
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [tokenData, setTokenData] = useState({
     assetType: '',
     regulatoryFramework: '',
@@ -80,18 +81,37 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Mobile Menu Overlay */}
+      <div 
+        className={`mobile-menu-overlay ${mobileMenuOpen ? 'open' : ''}`}
+        onClick={() => setMobileMenuOpen(false)}
+      />
+      
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-white shadow-sm border-b sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
+          <div className="flex justify-between items-center py-4 sm:py-6">
+            <div className="flex items-center gap-3">
+              {/* Mobile Menu Toggle */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="md:hidden -ml-2"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </Button>
               <div className="flex-shrink-0">
-                <h1 className="text-2xl font-bold text-gray-900">RWA-Studio</h1>
-                <p className="text-sm text-gray-500">Tokenize Real-World Assets in 5 Clicks</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">RWA-Studio</h1>
+                <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">Tokenize Real-World Assets in 5 Clicks</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Badge 
+                variant="outline" 
+                className="bg-green-50 text-green-700 border-green-200 hidden sm:inline-flex"
+              >
                 🔒 ERC-3643 Compliant
               </Badge>
               <ConnectWallet />
@@ -102,20 +122,95 @@ function AppContent() {
 
       {/* Progress Bar */}
       <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">Progress</span>
-            <span className="text-sm text-gray-500">{completedSteps.length}/5 steps completed</span>
+            <span className="text-xs sm:text-sm font-medium text-gray-700">Progress</span>
+            <span className="text-xs sm:text-sm text-gray-500">{completedSteps.length}/5 steps</span>
           </div>
           <Progress value={progress} className="w-full" />
         </div>
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Steps Sidebar */}
-          <div className="lg:col-span-1">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 safe-area-inset">
+        {/* Mobile Steps Indicator */}
+        <div className="lg:hidden mb-4">
+          <div className="flex items-center justify-between bg-white rounded-lg p-3 shadow-sm">
+            <div className="flex items-center gap-2">
+              <span className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+                {currentStep}
+              </span>
+              <div>
+                <p className="font-medium text-sm">{steps[currentStep - 1]?.title}</p>
+                <p className="text-xs text-muted-foreground">{steps[currentStep - 1]?.description}</p>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              All Steps
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-8">
+          {/* Mobile Steps Menu (Slide-out) */}
+          <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''} lg:hidden`}>
+            <div className="p-4 border-b flex items-center justify-between">
+              <h3 className="font-semibold">Tokenization Steps</h3>
+              <Button variant="ghost" size="sm" onClick={() => setMobileMenuOpen(false)}>
+                <X size={20} />
+              </Button>
+            </div>
+            <div className="p-4 space-y-3 touch-scroll" style={{ maxHeight: 'calc(100vh - 80px)' }}>
+              {steps.map((step) => {
+                const Icon = step.icon
+                const isCompleted = completedSteps.includes(step.id)
+                const isCurrent = currentStep === step.id
+                
+                return (
+                  <button
+                    key={step.id}
+                    className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors text-left ${
+                      isCurrent ? 'bg-blue-50 border border-blue-200' : 
+                      isCompleted ? 'bg-green-50' : 'bg-gray-50'
+                    }`}
+                    onClick={() => {
+                      if (isCompleted || step.id <= Math.max(...completedSteps, 0) + 1) {
+                        setCurrentStep(step.id)
+                        setMobileMenuOpen(false)
+                      }
+                    }}
+                  >
+                    <div className={`flex-shrink-0 ${
+                      isCompleted ? 'text-green-600' : 
+                      isCurrent ? 'text-blue-600' : 'text-gray-400'
+                    }`}>
+                      {isCompleted ? <CheckCircle size={20} /> : <Circle size={20} />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-medium ${
+                        isCurrent ? 'text-blue-900' : 
+                        isCompleted ? 'text-green-900' : 'text-gray-900'
+                      }`}>
+                        {step.title}
+                      </p>
+                      <p className="text-xs text-gray-500">{step.description}</p>
+                    </div>
+                    <Icon size={16} className={
+                      isCompleted ? 'text-green-600' : 
+                      isCurrent ? 'text-blue-600' : 'text-gray-400'
+                    } />
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Desktop Steps Sidebar */}
+          <div className="hidden lg:block lg:col-span-1">
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Tokenization Steps</CardTitle>

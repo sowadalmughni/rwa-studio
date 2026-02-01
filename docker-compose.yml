@@ -23,6 +23,28 @@ services:
       - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173}
       - RATELIMIT_STORAGE_URL=${RATELIMIT_STORAGE_URL:-redis://redis:6379}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      # Phase 3: Celery Configuration
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/1}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/2}
+      # Phase 3: KYC Provider (Onfido)
+      - ONFIDO_API_TOKEN=${ONFIDO_API_TOKEN}
+      - ONFIDO_WEBHOOK_SECRET=${ONFIDO_WEBHOOK_SECRET}
+      # Phase 3: Payment Gateway (Stripe)
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - STRIPE_PRICE_STARTER=${STRIPE_PRICE_STARTER}
+      - STRIPE_PRICE_PROFESSIONAL=${STRIPE_PRICE_PROFESSIONAL}
+      - STRIPE_PRICE_ENTERPRISE=${STRIPE_PRICE_ENTERPRISE}
+      # Phase 3: Email Service (SendGrid)
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - EMAIL_FROM_ADDRESS=${EMAIL_FROM_ADDRESS:-noreply@rwa-studio.com}
+      - EMAIL_FROM_NAME=${EMAIL_FROM_NAME:-RWA-Studio}
+      # Phase 3: IPFS Storage (Pinata)
+      - PINATA_API_KEY=${PINATA_API_KEY}
+      - PINATA_SECRET_KEY=${PINATA_SECRET_KEY}
+      - PINATA_JWT=${PINATA_JWT}
+      - IPFS_GATEWAY_URL=${IPFS_GATEWAY_URL:-https://gateway.pinata.cloud/ipfs}
     volumes:
       - backend-data:/app/src/database
       - ./backend/src:/app/src:ro  # Mount source for development
@@ -78,6 +100,61 @@ services:
       timeout: 5s
       retries: 5
     command: redis-server --appendonly yes
+
+  # ==========================================
+  # CELERY WORKER (Async Task Processing)
+  # ==========================================
+  celery-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rwa-studio-celery-worker
+    restart: unless-stopped
+    command: celery -A src.tasks.celery_app:celery_app worker --loglevel=info
+    environment:
+      - FLASK_ENV=${FLASK_ENV:-development}
+      - SECRET_KEY=${SECRET_KEY}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///database/app.db}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/1}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/2}
+      # Phase 3: External Services
+      - ONFIDO_API_TOKEN=${ONFIDO_API_TOKEN}
+      - ONFIDO_WEBHOOK_SECRET=${ONFIDO_WEBHOOK_SECRET}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - EMAIL_FROM_ADDRESS=${EMAIL_FROM_ADDRESS:-noreply@rwa-studio.com}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - PINATA_API_KEY=${PINATA_API_KEY}
+      - PINATA_SECRET_KEY=${PINATA_SECRET_KEY}
+    volumes:
+      - backend-data:/app/src/database
+      - ./backend/src:/app/src:ro
+    depends_on:
+      - redis
+    networks:
+      - rwa-network
+
+  # ==========================================
+  # CELERY BEAT (Scheduled Tasks)
+  # ==========================================
+  celery-beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rwa-studio-celery-beat
+    restart: unless-stopped
+    command: celery -A src.tasks.celery_app:celery_app beat --loglevel=info
+    environment:
+      - FLASK_ENV=${FLASK_ENV:-development}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/1}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/2}
+    depends_on:
+      - redis
+      - celery-worker
+    networks:
+      - rwa-network
+    profiles:
+      - production
 
   # ==========================================
   # POSTGRESQL (Production Database)

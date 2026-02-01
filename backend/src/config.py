@@ -90,6 +90,52 @@ class Config:
     LOG_FORMAT = os.environ.get('LOG_FORMAT', 'json')
     
     # ==========================================
+    # PHASE 3: KYC PROVIDER (Onfido)
+    # ==========================================
+    
+    ONFIDO_API_TOKEN = os.environ.get('ONFIDO_API_TOKEN')
+    ONFIDO_WEBHOOK_SECRET = os.environ.get('ONFIDO_WEBHOOK_SECRET')
+    ONFIDO_API_URL = os.environ.get('ONFIDO_API_URL', 'https://api.onfido.com/v3.6')
+    ONFIDO_REGION = os.environ.get('ONFIDO_REGION', 'us')
+    
+    # ==========================================
+    # PHASE 3: PAYMENT GATEWAY (Stripe)
+    # ==========================================
+    
+    STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
+    STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY')
+    STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
+    
+    # Subscription Plans
+    STRIPE_PRICE_STARTER = os.environ.get('STRIPE_PRICE_STARTER')
+    STRIPE_PRICE_PROFESSIONAL = os.environ.get('STRIPE_PRICE_PROFESSIONAL')
+    STRIPE_PRICE_ENTERPRISE = os.environ.get('STRIPE_PRICE_ENTERPRISE')
+    
+    # ==========================================
+    # PHASE 3: EMAIL SERVICE (SendGrid)
+    # ==========================================
+    
+    SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
+    EMAIL_FROM_ADDRESS = os.environ.get('EMAIL_FROM_ADDRESS', 'noreply@rwa-studio.com')
+    EMAIL_FROM_NAME = os.environ.get('EMAIL_FROM_NAME', 'RWA-Studio')
+    
+    # ==========================================
+    # PHASE 3: IPFS STORAGE (Pinata)
+    # ==========================================
+    
+    PINATA_API_KEY = os.environ.get('PINATA_API_KEY')
+    PINATA_SECRET_KEY = os.environ.get('PINATA_SECRET_KEY')
+    PINATA_JWT = os.environ.get('PINATA_JWT')
+    IPFS_GATEWAY_URL = os.environ.get('IPFS_GATEWAY_URL', 'https://gateway.pinata.cloud/ipfs')
+    
+    # ==========================================
+    # PHASE 3: CELERY (Async Tasks)
+    # ==========================================
+    
+    CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379/1')
+    CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://localhost:6379/2')
+    
+    # ==========================================
     # ENVIRONMENT
     # ==========================================
     

@@ -1,8 +1,18 @@
 """
 Authentication Route Tests for RWA-Studio
+
+Note: Tests use strong passwords that meet complexity requirements:
+- Minimum 8 characters
+- At least one uppercase letter
+- At least one lowercase letter
+- At least one digit
+- At least one special character
 """
 
 import pytest
+
+# Strong password for testing that meets all complexity requirements
+STRONG_PASSWORD = 'TestPass123!'
 
 
 class TestAuthRoutes:
@@ -13,7 +23,7 @@ class TestAuthRoutes:
         response = client.post('/api/auth/register', json={
             'username': 'newuser',
             'email': 'newuser@example.com',
-            'password': 'password123'
+            'password': STRONG_PASSWORD
         })
         
         assert response.status_code == 201
@@ -27,7 +37,7 @@ class TestAuthRoutes:
         """Test registration with missing username"""
         response = client.post('/api/auth/register', json={
             'email': 'test@example.com',
-            'password': 'password123'
+            'password': STRONG_PASSWORD
         })
         
         assert response.status_code == 400
@@ -39,7 +49,7 @@ class TestAuthRoutes:
         response = client.post('/api/auth/register', json={
             'username': 'testuser',
             'email': 'invalid-email',
-            'password': 'password123'
+            'password': STRONG_PASSWORD
         })
         
         assert response.status_code == 400
@@ -58,20 +68,32 @@ class TestAuthRoutes:
         data = response.get_json()
         assert data['success'] is False
     
+    def test_register_weak_password(self, client):
+        """Test registration with password lacking complexity"""
+        response = client.post('/api/auth/register', json={
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'password123'  # No uppercase or special char
+        })
+        
+        assert response.status_code == 400
+        data = response.get_json()
+        assert data['success'] is False
+    
     def test_register_duplicate_username(self, client):
         """Test registration with duplicate username"""
         # First registration
         client.post('/api/auth/register', json={
             'username': 'duplicate',
             'email': 'first@example.com',
-            'password': 'password123'
+            'password': STRONG_PASSWORD
         })
         
         # Second registration with same username
         response = client.post('/api/auth/register', json={
             'username': 'duplicate',
             'email': 'second@example.com',
-            'password': 'password123'
+            'password': STRONG_PASSWORD
         })
         
         assert response.status_code == 409
@@ -84,13 +106,13 @@ class TestAuthRoutes:
         client.post('/api/auth/register', json={
             'username': 'logintest',
             'email': 'logintest@example.com',
-            'password': 'password123'
+            'password': STRONG_PASSWORD
         })
         
         # Then login
         response = client.post('/api/auth/login', json={
             'email': 'logintest@example.com',
-            'password': 'password123'
+            'password': STRONG_PASSWORD
         })
         
         assert response.status_code == 200
@@ -124,7 +146,7 @@ class TestAuthRoutes:
         response = client.post('/api/auth/register', json={
             'username': 'walletuser',
             'email': 'wallet@example.com',
-            'password': 'password123',
+            'password': STRONG_PASSWORD,
             'wallet_address': '0x742d35Cc6634C0532925a3b844Bc9e7595f8dBe0'
         })
         
@@ -138,7 +160,7 @@ class TestAuthRoutes:
         response = client.post('/api/auth/register', json={
             'username': 'badwallet',
             'email': 'badwallet@example.com',
-            'password': 'password123',
+            'password': STRONG_PASSWORD,
             'wallet_address': 'invalid-address'
         })
         

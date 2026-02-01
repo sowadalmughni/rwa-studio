@@ -11,8 +11,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 # Set testing environment
 os.environ['FLASK_ENV'] = 'testing'
-os.environ['SECRET_KEY'] = 'test-secret-key'
-os.environ['JWT_SECRET_KEY'] = 'test-jwt-secret'
+os.environ['SECRET_KEY'] = 'test-secret-key-for-testing-only-not-production'
+os.environ['JWT_SECRET_KEY'] = 'test-jwt-secret-key-for-testing-only'
+
+# Strong password for test fixtures that meets complexity requirements
+TEST_PASSWORD = 'TestPass123!'
 
 
 @pytest.fixture(scope='session')
@@ -45,17 +48,17 @@ def runner(app):
 @pytest.fixture
 def auth_headers(client):
     """Get authentication headers for protected routes"""
-    # Register a test user
+    # Register a test user with strong password
     client.post('/api/auth/register', json={
         'username': 'testuser',
         'email': 'test@example.com',
-        'password': 'testpassword123'
+        'password': TEST_PASSWORD
     })
     
     # Login to get token
     response = client.post('/api/auth/login', json={
         'email': 'test@example.com',
-        'password': 'testpassword123'
+        'password': TEST_PASSWORD
     })
     
     data = response.get_json()
@@ -67,18 +70,18 @@ def auth_headers(client):
 @pytest.fixture
 def admin_headers(client):
     """Get admin authentication headers"""
-    # Register an admin user
+    # Register an admin user with strong password
     client.post('/api/auth/register', json={
         'username': 'adminuser',
         'email': 'admin@example.com',
-        'password': 'adminpassword123',
+        'password': TEST_PASSWORD,
         'role': 'admin'
     })
     
     # Login to get token
     response = client.post('/api/auth/login', json={
         'email': 'admin@example.com',
-        'password': 'adminpassword123'
+        'password': TEST_PASSWORD
     })
     
     data = response.get_json()

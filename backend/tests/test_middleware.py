@@ -97,12 +97,15 @@ class TestValidationHelpers:
 class TestSchemaValidation:
     """Test request schema validation"""
     
+    # Strong password for testing that meets complexity requirements
+    STRONG_PASSWORD = 'TestPass123!'
+    
     def test_register_schema_valid(self):
-        """Test valid registration data"""
+        """Test valid registration data with strong password"""
         data = {
             'username': 'testuser',
             'email': 'test@example.com',
-            'password': 'password123'
+            'password': self.STRONG_PASSWORD
         }
         validated = REGISTER_SCHEMA.validate(data)
         assert validated['username'] == 'testuser'
@@ -123,7 +126,17 @@ class TestSchemaValidation:
         data = {
             'username': 'testuser',
             'email': 'invalid-email',
-            'password': 'password123'
+            'password': self.STRONG_PASSWORD
+        }
+        with pytest.raises(Exception):
+            REGISTER_SCHEMA.validate(data)
+    
+    def test_register_schema_weak_password(self):
+        """Test registration with weak password (missing complexity)"""
+        data = {
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'password123'  # No uppercase or special char
         }
         with pytest.raises(Exception):
             REGISTER_SCHEMA.validate(data)
@@ -132,7 +145,7 @@ class TestSchemaValidation:
         """Test valid login data"""
         data = {
             'email': 'test@example.com',
-            'password': 'password123'
+            'password': 'password123'  # Login doesn't validate password strength
         }
         validated = LOGIN_SCHEMA.validate(data)
         assert validated['email'] == 'test@example.com'

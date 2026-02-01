@@ -30,12 +30,12 @@ RWA-Studio is a comprehensive platform for tokenizing real-world assets with bui
 
 ### Key Features
 
-- ✅ **Compliance-by-Default**: Automatic compliance rule deployment
-- ✅ **Multi-Jurisdiction Support**: US, EU, UK, CA, AU, SG
-- ✅ **Asset Type Flexibility**: Real estate, funds, debt, commodities, equity, art
-- ✅ **Professional UX**: Enterprise-grade interface for lawyers and fund managers
-- ✅ **Shareable Asset Pages**: Dynamic pages with compliance badges
-- ✅ **Transfer Agent APIs**: Complete backend for compliance operations
+- **Compliance-by-Default**: Automatic compliance rule deployment
+- **Multi-Jurisdiction Support**: US, EU, UK, CA, AU, SG
+- **Asset Type Flexibility**: Real estate, funds, debt, commodities, equity, art
+- **Professional UX**: Enterprise-grade interface for lawyers and fund managers
+- **Shareable Asset Pages**: Dynamic pages with compliance badges
+- **Transfer Agent APIs**: Complete backend for compliance operations
 
 ## Quick Start
 
@@ -68,6 +68,7 @@ cd smart-contracts && yarn install && cd ..
 ### Development Setup
 
 1. **Start the Frontend**:
+
 ```bash
 cd frontend
 npm run dev
@@ -75,6 +76,7 @@ npm run dev
 ```
 
 2. **Start the Backend**:
+
 ```bash
 cd backend
 python src/main.py
@@ -82,6 +84,7 @@ python src/main.py
 ```
 
 3. **Compile Smart Contracts**:
+
 ```bash
 cd smart-contracts
 npx hardhat compile
@@ -132,6 +135,7 @@ RWA-Studio follows a modular architecture with clear separation of concerns:
 ### Core Contracts
 
 #### RWAToken.sol
+
 The main token contract implementing ERC-3643 standard:
 
 ```solidity
@@ -144,6 +148,7 @@ contract RWAToken is ERC20, Ownable, Pausable, ReentrancyGuard, IERC3643 {
 ```
 
 **Key Features**:
+
 - ERC-20 compatible with compliance overlay
 - Pausable transfers for emergency situations
 - Asset metadata storage (IPFS integration)
@@ -151,6 +156,7 @@ contract RWAToken is ERC20, Ownable, Pausable, ReentrancyGuard, IERC3643 {
 - Identity registry integration
 
 #### ComplianceModule.sol
+
 Manages compliance rules and transfer validation:
 
 ```solidity
@@ -162,6 +168,7 @@ contract ComplianceModule is ICompliance, Ownable {
 ```
 
 #### IdentityRegistry.sol
+
 Manages verified addresses and KYC/AML data:
 
 ```solidity
@@ -243,11 +250,11 @@ The application uses React hooks for state management:
 ```jsx
 const [currentStep, setCurrentStep] = useState(1);
 const [tokenConfig, setTokenConfig] = useState({
-  assetType: '',
-  framework: '',
+  assetType: "",
+  framework: "",
   tokenomics: {},
   restrictions: {},
-  deployment: {}
+  deployment: {},
 });
 ```
 
@@ -266,6 +273,7 @@ The transfer agent console provides professional tools for compliance management
 ### API Endpoints
 
 #### Token Management
+
 ```http
 GET /api/transfer-agent/tokens
 POST /api/transfer-agent/tokens
@@ -273,6 +281,7 @@ GET /api/transfer-agent/tokens/{address}
 ```
 
 #### Identity Verification
+
 ```http
 GET /api/transfer-agent/tokens/{address}/verified-addresses
 POST /api/transfer-agent/tokens/{address}/verified-addresses
@@ -280,6 +289,7 @@ PUT /api/transfer-agent/verified-addresses/{id}
 ```
 
 #### Compliance Monitoring
+
 ```http
 GET /api/transfer-agent/tokens/{address}/compliance-events
 POST /api/transfer-agent/compliance-events
@@ -287,6 +297,7 @@ PUT /api/transfer-agent/compliance-events/{id}/resolve
 ```
 
 #### Analytics
+
 ```http
 GET /api/transfer-agent/tokens/{address}/metrics
 GET /api/transfer-agent/dashboard/overview
@@ -322,8 +333,8 @@ module.exports = {
   rwaStudio: {
     defaultNetwork: "polygon",
     apiKey: "your-api-key",
-    factoryAddress: "0x..." // Optional: custom factory
-  }
+    factoryAddress: "0x...", // Optional: custom factory
+  },
 };
 ```
 
@@ -397,17 +408,20 @@ Error responses:
 ### Development Deployment
 
 1. **Local Blockchain**:
+
 ```bash
 cd smart-contracts
 npx hardhat node
 ```
 
 2. **Deploy Contracts**:
+
 ```bash
 npx hardhat rwa:deploy --network localhost --name "Test Token" --symbol "TEST" --asset-type "funds" --framework "RegD" --jurisdiction "US"
 ```
 
 3. **Start Services**:
+
 ```bash
 # Terminal 1: Frontend
 cd frontend && npm run dev
@@ -419,6 +433,7 @@ cd backend && python src/main.py
 ### Production Deployment
 
 1. **Smart Contracts**:
+
 ```bash
 # Deploy to mainnet
 npx hardhat rwa:deploy --network mainnet --name "Production Token" --symbol "PROD" --asset-type "real-estate" --framework "RegS" --jurisdiction "EU"
@@ -428,6 +443,7 @@ npx hardhat verify --network mainnet 0x...
 ```
 
 2. **Frontend**:
+
 ```bash
 cd frontend
 npm run build
@@ -435,6 +451,7 @@ npm run build
 ```
 
 3. **Backend**:
+
 ```bash
 cd backend
 # Configure production database
@@ -515,5 +532,4 @@ For support and questions:
 
 ---
 
-**Built with ❤️ by Sowad Al-Mughni**
-
+**Built by Sowad Al-Mughni**

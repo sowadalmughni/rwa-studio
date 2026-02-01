@@ -3,29 +3,21 @@
  * Displays a single metric with optional trend
  */
 
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export function StatCard({
-  title,
-  value,
-  description,
-  icon: Icon,
-  trend,
-  trendValue,
-  className,
-}) {
+export function StatCard({ title, value, description, icon: Icon, trend, trendValue, className }) {
   const getTrendIcon = () => {
     if (!trend) return null;
-    if (trend === 'up') return <TrendingUp className="h-4 w-4 text-green-500" />;
-    if (trend === 'down') return <TrendingDown className="h-4 w-4 text-red-500" />;
+    if (trend === "up") return <TrendingUp className="h-4 w-4 text-green-500" />;
+    if (trend === "down") return <TrendingDown className="h-4 w-4 text-red-500" />;
     return <Minus className="h-4 w-4 text-muted-foreground" />;
   };
 
   const getTrendColor = () => {
-    if (trend === 'up') return 'text-green-500';
-    if (trend === 'down') return 'text-red-500';
-    return 'text-muted-foreground';
+    if (trend === "up") return "text-green-500";
+    if (trend === "down") return "text-red-500";
+    return "text-muted-foreground";
   };
 
   return (

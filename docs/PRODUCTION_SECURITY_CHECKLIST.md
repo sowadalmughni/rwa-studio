@@ -75,13 +75,13 @@ Our security hardening implementation provides:
 
 ### Rate Limiting (OWASP A05:2021)
 
-| Endpoint Type | Limit | Purpose |
-|--------------|-------|---------|
-| Auth | 20/min | Prevent brute force |
-| Sensitive | 5/min | Protect critical operations |
-| Write | 30/min | Prevent abuse |
-| Read | 200/min | Allow normal usage |
-| Public | 60/min | Protect unauthenticated endpoints |
+| Endpoint Type | Limit   | Purpose                           |
+| ------------- | ------- | --------------------------------- |
+| Auth          | 20/min  | Prevent brute force               |
+| Sensitive     | 5/min   | Protect critical operations       |
+| Write         | 30/min  | Prevent abuse                     |
+| Read          | 200/min | Allow normal usage                |
+| Public        | 60/min  | Protect unauthenticated endpoints |
 
 ### Account Lockout
 

@@ -4,19 +4,21 @@
 
 Ever tried to tokenize a real estate fund or private equity offering? If you have, you know the pain: enterprise platforms that cost $50K+ upfront, take months to implement, and require a team of blockchain developers. That's exactly what RWA-Studio fixes.
 
-Whether you're a fund manager launching a Reg D offering, a lawyer structuring a real estate syndication, or a compliance officer managing investor restrictions, RWA-Studio lets you deploy fully compliant security tokens in under 5 minutes—no blockchain experience required.
+Whether you're a fund manager launching a Reg D offering, a lawyer structuring a real estate syndication, or a compliance officer managing investor restrictions, RWA-Studio lets you deploy fully compliant security tokens in under 5 minutes - no blockchain experience required.
 
 ## What's the Big Idea?
 
 Imagine you're launching a $10M real estate fund. Traditional tokenization means:
+
 - 💸 **$50,000+** for enterprise platform licenses
 - ⏰ **3-6 months** of implementation and customization
 - 👥 **A team** of Solidity developers, compliance experts, and integrators
 
 RWA-Studio flips this entirely:
-- 🆓 **Open source** — no licensing fees, ever
-- ⚡ **5 minutes** — from concept to deployed token
-- 🎯 **5 clicks** — asset type, regulation, economics, restrictions, deploy
+
+- 🆓 **Open source** - no licensing fees, ever
+- ⚡ **5 minutes** - from concept to deployed token
+- 🎯 **5 clicks** - asset type, regulation, economics, restrictions, deploy
 
 Built on the **ERC-3643** security token standard (the same one used by BlackRock, Franklin Templeton, and major institutions), RWA-Studio makes institutional-grade compliance accessible to everyone.
 
@@ -76,24 +78,28 @@ docker-compose ps
 ## Real-World Use Cases
 
 ### Fund Managers
+
 - Launch Reg D/Reg S offerings without enterprise platform fees
 - Automate investor verification and transfer restrictions
 - Generate compliant asset pages for investor relations
 - Track cap table and manage distributions
 
 ### Real Estate Syndicators
+
 - Tokenize commercial properties for fractional ownership
 - Enforce holding periods and accreditation requirements
 - Manage 99-investor limits for 506(b) offerings
 - Generate audit-ready compliance reports
 
 ### Private Equity Firms
+
 - Create liquid secondary markets for LP interests
 - Automate transfer agent functions
 - Enforce geographic and jurisdictional restrictions
 - Maintain real-time investor registries
 
 ### Compliance Officers
+
 - Monitor all token transfers in real-time
 - Verify investor accreditation status
 - Generate regulatory reports on demand
@@ -128,11 +134,11 @@ The 5-click flow:
 Built on ERC-3643, every token comes with institutional-grade compliance:
 
 - **5 Modular Compliance Rules**:
-  - `InvestorLimitRule` — Enforce Reg D 99-investor cap or Reg CF 1000-investor limit
-  - `GeographicRule` — Restrict transfers by jurisdiction (US, EU, UK, etc.)
-  - `AccreditedInvestorRule` — Require investor accreditation verification
-  - `HoldingPeriodRule` — Enforce lock-up periods (6mo, 12mo, custom)
-  - `TransferLimitRule` — Cap maximum transfer amounts
+  - `InvestorLimitRule` - Enforce Reg D 99-investor cap or Reg CF 1000-investor limit
+  - `GeographicRule` - Restrict transfers by jurisdiction (US, EU, UK, etc.)
+  - `AccreditedInvestorRule` - Require investor accreditation verification
+  - `HoldingPeriodRule` - Enforce lock-up periods (6mo, 12mo, custom)
+  - `TransferLimitRule` - Cap maximum transfer amounts
 
 - **Multi-Regulatory Support**: Reg D 506(b), Reg D 506(c), Reg S, Reg CF, Reg A+
 
@@ -140,27 +146,28 @@ Built on ERC-3643, every token comes with institutional-grade compliance:
 
 Full-featured backend API for token management:
 
-- **Identity Registry** — Manage verified investor addresses
-- **Compliance Monitoring** — Real-time transfer validation
-- **Event Logging** — Complete audit trail
-- **JWT + Wallet Auth** — Secure dual authentication
-- **Rate Limiting** — Protection against abuse
+- **Identity Registry** - Manage verified investor addresses
+- **Compliance Monitoring** - Real-time transfer validation
+- **Event Logging** - Complete audit trail
+- **JWT + Wallet Auth** - Secure dual authentication
+- **Rate Limiting** - Protection against abuse
 
 ### 🔗 Network Support
 
 RWA-Studio uses ERC-3643 compliant smart contracts that can be deployed to any EVM-compatible network:
 
-| Network | Status | Notes |
-|---------|--------|-------|
+| Network          | Status    | Notes                           |
+| ---------------- | --------- | ------------------------------- |
 | Ethereum Sepolia | ✅ Tested | Primary testnet for development |
-| Ethereum Mainnet | 🟡 Ready | Requires mainnet RPC and gas |
-| Polygon | 🟡 Ready | Lower gas costs, L2 deployment |
-| Arbitrum | 🟡 Ready | L2 optimistic rollup |
-| Base | 🟡 Ready | Coinbase L2 |
+| Ethereum Mainnet | 🟡 Ready  | Requires mainnet RPC and gas    |
+| Polygon          | 🟡 Ready  | Lower gas costs, L2 deployment  |
+| Arbitrum         | 🟡 Ready  | L2 optimistic rollup            |
+| Base             | 🟡 Ready  | Coinbase L2                     |
 
 **Status Key:**
-- ✅ **Tested** — Verified working with automated tests
-- 🟡 **Ready** — Contracts compatible, requires network config
+
+- ✅ **Tested** - Verified working with automated tests
+- 🟡 **Ready** - Contracts compatible, requires network config
 
 **Current Limitation:** The default configuration targets a single network at a time. Multi-chain deployment (deploying the same token across multiple networks) is on the roadmap but not yet implemented. To deploy on a different network, update your Hardhat config with the appropriate RPC URL and deploy separately.
 
@@ -194,10 +201,10 @@ npx hardhat generate-asset-page --token 0x... --template professional
 
 ### 📊 Enterprise Observability
 
-- **Structured Logging** — JSON-formatted logs for analysis
-- **Health Checks** — Built-in monitoring endpoints
-- **Docker Compose** — One-command deployment
-- **PostgreSQL** — Production-ready database
+- **Structured Logging** - JSON-formatted logs for analysis
+- **Health Checks** - Built-in monitoring endpoints
+- **Docker Compose** - One-command deployment
+- **PostgreSQL** - Production-ready database
 
 ## Deployment
 
@@ -289,6 +296,7 @@ rwa-studio/
 ## Roadmap
 
 ### Phase 1: Foundation ✅
+
 - [x] ERC-3643 token implementation
 - [x] 5-click tokenization wizard
 - [x] Wallet integration (RainbowKit)
@@ -296,6 +304,7 @@ rwa-studio/
 - [x] Basic compliance rules
 
 ### Phase 2: Security & Quality ✅
+
 - [x] 5 modular compliance rules
 - [x] Rate limiting & input validation
 - [x] Docker containerization
@@ -304,6 +313,7 @@ rwa-studio/
 - [x] Security audit documentation
 
 ### Phase 3: Integration Services (Q1 2026)
+
 - [ ] KYC provider integration (Onfido, Jumio)
 - [ ] Payment gateway (Stripe, crypto rails)
 - [ ] Email notification service
@@ -311,6 +321,7 @@ rwa-studio/
 - [ ] Advanced analytics dashboard
 
 ### Phase 4: Scale & Ecosystem (Q2 2026)
+
 - [ ] Multi-chain deployment automation
 - [ ] Secondary market support
 - [ ] Governance token integration
@@ -318,6 +329,7 @@ rwa-studio/
 - [ ] Mobile application
 
 ### Phase 5: Enterprise (Q3-Q4 2026)
+
 - [ ] White-label solutions
 - [ ] Enterprise SSO/LDAP
 - [ ] Custom compliance rule builder
@@ -382,12 +394,12 @@ npx hardhat test
 
 Security is critical for financial infrastructure. Here's our approach:
 
-- **ERC-3643 Standard** — Battle-tested security token standard
-- **OpenZeppelin Contracts** — Industry-standard Solidity libraries
-- **Comprehensive Testing** — 67 automated tests
-- **Audit Documentation** — Prepared for OpenZeppelin security audit
-- **Rate Limiting** — Protection against API abuse
-- **Input Validation** — All endpoints validated
+- **ERC-3643 Standard** - Battle-tested security token standard
+- **OpenZeppelin Contracts** - Industry-standard Solidity libraries
+- **Comprehensive Testing** - 67 automated tests
+- **Audit Documentation** - Prepared for OpenZeppelin security audit
+- **Rate Limiting** - Protection against API abuse
+- **Input Validation** - All endpoints validated
 
 ### Security Checklist
 
@@ -406,17 +418,17 @@ Found a security issue? Please email **sowad@kitalonlabs.com** instead of openin
 
 ## License
 
-MIT License — see [LICENSE](LICENSE) for details.
+MIT License - see [LICENSE](LICENSE) for details.
 
 ## Acknowledgments
 
 This project builds on the incredible work of:
 
-- [OpenZeppelin](https://openzeppelin.com/) — Security standards and Solidity libraries
-- [Tokeny](https://tokeny.com/) — ERC-3643 security token standard
-- [Hardhat](https://hardhat.org/) — Ethereum development framework
-- [RainbowKit](https://www.rainbowkit.com/) — Beautiful wallet connection
-- [shadcn/ui](https://ui.shadcn.com/) — Stunning React components
+- [OpenZeppelin](https://openzeppelin.com/) - Security standards and Solidity libraries
+- [Tokeny](https://tokeny.com/) - ERC-3643 security token standard
+- [Hardhat](https://hardhat.org/) - Ethereum development framework
+- [RainbowKit](https://www.rainbowkit.com/) - Beautiful wallet connection
+- [shadcn/ui](https://ui.shadcn.com/) - Stunning React components
 - The broader DeFi and RWA tokenization community
 
 ## Support
@@ -429,6 +441,6 @@ This project builds on the incredible work of:
 
 ---
 
-**Maintained by [Kitalon Labs](https://kitalonlabs.com)** — Md. Sowad Al-Mughni (sowad@kitalonlabs.com)
+**Maintained by [Kitalon Labs](https://kitalonlabs.com)** | Md. Sowad Al-Mughni (sowad@kitalonlabs.com)
 
 Made with ❤️ for the future of finance

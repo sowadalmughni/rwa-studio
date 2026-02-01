@@ -88,9 +88,9 @@ describe("RWAToken", function () {
     });
 
     it("Should prevent minting to unverified addresses", async function () {
-      await expect(
-        rwaToken.mint(addr1.address, ethers.parseEther("100"))
-      ).to.be.revertedWith("RWAToken: Account not verified");
+      await expect(rwaToken.mint(addr1.address, ethers.parseEther("100"))).to.be.revertedWith(
+        "RWAToken: Account not verified"
+      );
     });
 
     it("Should allow minting to verified addresses", async function () {
@@ -184,11 +184,9 @@ describe("RWAToken", function () {
       await rwaToken.setTransfersEnabled(true);
 
       // Should be able to check transfer compliance
-      expect(await rwaToken.canTransfer(
-        addr1.address,
-        addr2.address,
-        ethers.parseEther("50")
-      )).to.equal(true);
+      expect(
+        await rwaToken.canTransfer(addr1.address, addr2.address, ethers.parseEther("50"))
+      ).to.equal(true);
     });
 
     it("Should get compliance status", async function () {
@@ -208,10 +206,7 @@ describe("RWAToken", function () {
     });
 
     it("Should allow owner to update asset information", async function () {
-      await rwaToken.updateAssetInfo(
-        "Updated description",
-        "QmNewDocumentHash"
-      );
+      await rwaToken.updateAssetInfo("Updated description", "QmNewDocumentHash");
 
       const assetInfo = await rwaToken.assetInfo();
       expect(assetInfo.description).to.equal("Updated description");
@@ -219,13 +214,15 @@ describe("RWAToken", function () {
     });
 
     it("Should prevent non-owners from administrative functions", async function () {
-      await expect(
-        rwaToken.connect(addr1).pause()
-      ).to.be.revertedWithCustomError(rwaToken, "OwnableUnauthorizedAccount");
+      await expect(rwaToken.connect(addr1).pause()).to.be.revertedWithCustomError(
+        rwaToken,
+        "OwnableUnauthorizedAccount"
+      );
 
-      await expect(
-        rwaToken.connect(addr1).setTransfersEnabled(true)
-      ).to.be.revertedWithCustomError(rwaToken, "OwnableUnauthorizedAccount");
+      await expect(rwaToken.connect(addr1).setTransfersEnabled(true)).to.be.revertedWithCustomError(
+        rwaToken,
+        "OwnableUnauthorizedAccount"
+      );
     });
   });
 
@@ -244,10 +241,10 @@ describe("RWAToken", function () {
 
     it("Should enforce maximum supply", async function () {
       const maxSupply = await rwaToken.maxSupply();
-      
-      await expect(
-        rwaToken.mint(addr1.address, maxSupply + 1n)
-      ).to.be.revertedWith("RWAToken: Exceeds max supply");
+
+      await expect(rwaToken.mint(addr1.address, maxSupply + 1n)).to.be.revertedWith(
+        "RWAToken: Exceeds max supply"
+      );
     });
 
     it("Should allow burning tokens", async function () {
@@ -262,7 +259,7 @@ describe("RWAToken", function () {
   describe("Token Information", function () {
     it("Should return complete token information", async function () {
       const tokenInfo = await rwaToken.getTokenInfo();
-      
+
       expect(tokenInfo.name).to.equal("Real Estate Token");
       expect(tokenInfo.symbol).to.equal("RET");
       expect(tokenInfo.tokenDecimals).to.equal(18);
@@ -273,4 +270,3 @@ describe("RWAToken", function () {
     });
   });
 });
-

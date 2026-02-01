@@ -52,6 +52,7 @@ cd smart-contracts && npm install && cd ..
 ### Running Locally
 
 **Frontend:**
+
 ```bash
 cd frontend
 pnpm dev
@@ -59,6 +60,7 @@ pnpm dev
 ```
 
 **Backend:**
+
 ```bash
 cd backend
 python src/main.py
@@ -66,6 +68,7 @@ python src/main.py
 ```
 
 **Smart Contracts:**
+
 ```bash
 cd smart-contracts
 npx hardhat node
@@ -83,14 +86,14 @@ docker-compose up -d
 
 We follow a simplified GitFlow model:
 
-| Branch | Purpose | Base |
-|--------|---------|------|
-| `main` | Production-ready code | - |
-| `develop` | Integration branch for features | `main` |
-| `feature/*` | New features | `develop` |
-| `bugfix/*` | Bug fixes | `develop` |
-| `hotfix/*` | Urgent production fixes | `main` |
-| `release/*` | Release preparation | `develop` |
+| Branch      | Purpose                         | Base      |
+| ----------- | ------------------------------- | --------- |
+| `main`      | Production-ready code           | -         |
+| `develop`   | Integration branch for features | `main`    |
+| `feature/*` | New features                    | `develop` |
+| `bugfix/*`  | Bug fixes                       | `develop` |
+| `hotfix/*`  | Urgent production fixes         | `main`    |
+| `release/*` | Release preparation             | `develop` |
 
 ### Branch Naming
 
@@ -131,6 +134,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation only
@@ -140,6 +144,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `chore`: Maintenance tasks
 
 **Examples:**
+
 ```bash
 git commit -m "feat(contracts): add dividend distribution function"
 git commit -m "fix(backend): resolve JWT token expiration issue"
@@ -184,6 +189,7 @@ npx hardhat test test/RWAToken.test.js
 ```
 
 **Requirements:**
+
 - All contract functions must have test coverage
 - Test edge cases and failure scenarios
 - Include gas consumption tests for critical functions
@@ -204,6 +210,7 @@ npm run test:watch
 ```
 
 **Requirements:**
+
 - Test user interactions, not implementation details
 - Mock API calls and external dependencies
 - Test error states and loading states
@@ -241,18 +248,22 @@ npx playwright test --debug
 
 ```markdown
 ## Description
+
 [Describe what this PR does]
 
 ## Type of Change
+
 - [ ] Bug fix (non-breaking change that fixes an issue)
 - [ ] New feature (non-breaking change that adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to change)
 - [ ] Documentation update
 
 ## How Has This Been Tested?
+
 [Describe the tests you ran]
 
 ## Checklist
+
 - [ ] My code follows the project's style guidelines
 - [ ] I have performed a self-review of my code
 - [ ] I have commented my code, particularly in hard-to-understand areas
@@ -262,9 +273,11 @@ npx playwright test --debug
 - [ ] New and existing unit tests pass locally with my changes
 
 ## Screenshots (if applicable)
+
 [Add screenshots for UI changes]
 
 ## Related Issues
+
 Closes #[issue number]
 ```
 
@@ -292,12 +305,12 @@ def verify_investor(
 ) -> bool:
     """
     Verify an investor's eligibility for token transfers.
-    
+
     Args:
         address: Ethereum wallet address
         kyc_level: KYC verification level (1-3)
         jurisdiction: Two-letter country code
-        
+
     Returns:
         True if investor is verified, False otherwise
     """
@@ -320,7 +333,7 @@ const fetchUserTokens = async (userId) => {
 
 // Avoid
 const f = async (id) => {
-  return api.get(`/users/${id}/tokens`).then(r => r.data);
+  return api.get(`/users/${id}/tokens`).then((r) => r.data);
 };
 ```
 

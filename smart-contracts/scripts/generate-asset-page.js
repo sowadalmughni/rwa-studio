@@ -1,7 +1,7 @@
 /**
  * Generate Asset Page Script for RWA-Studio
  * Author: Sowad Al-Mughni
- * 
+ *
  * Generates shareable asset pages for RWA tokens with compliance badges
  */
 
@@ -12,37 +12,39 @@ const path = require("path");
 const Templates = {
   default: {
     name: "Default",
-    description: "Clean, professional template suitable for most assets"
+    description: "Clean, professional template suitable for most assets",
   },
   premium: {
     name: "Premium",
-    description: "Enhanced template with additional sections and styling"
+    description: "Enhanced template with additional sections and styling",
   },
   minimal: {
     name: "Minimal",
-    description: "Simplified template with essential information only"
-  }
+    description: "Simplified template with essential information only",
+  },
 };
 
 async function generateAssetPage(taskArgs, hre) {
-  console.log("🌐 Generating asset page with RWA-Studio...");
-  
+  console.log("Generating asset page with RWA-Studio...");
+
   const tokenAddress = taskArgs.token;
   const template = (taskArgs.template || "default").toLowerCase();
-  
-  console.log(`\n📋 Configuration:`);
+
+  console.log(`\nConfiguration:`);
   console.log(`   Token: ${tokenAddress}`);
   console.log(`   Template: ${template}`);
-  
+
   if (!(template in Templates)) {
-    throw new Error(`Invalid template: ${template}. Valid options: ${Object.keys(Templates).join(", ")}`);
+    throw new Error(
+      `Invalid template: ${template}. Valid options: ${Object.keys(Templates).join(", ")}`
+    );
   }
-  
+
   try {
     // Get token contract
     const RWAToken = await hre.ethers.getContractFactory("RWAToken");
     const token = RWAToken.attach(tokenAddress);
-    
+
     // Gather token information
     const tokenName = await token.name();
     const tokenSymbol = await token.symbol();
@@ -51,18 +53,18 @@ async function generateAssetPage(taskArgs, hre) {
     const transfersEnabled = await token.transfersEnabled();
     const owner = await token.owner();
     const assetInfo = await token.assetInfo();
-    
-    console.log(`\n📄 Token: ${tokenName} (${tokenSymbol})`);
-    
+
+    console.log(`\nToken: ${tokenName} (${tokenSymbol})`);
+
     // Get compliance information
     const complianceAddress = await token.compliance();
     const identityRegistryAddress = await token.identityRegistry();
-    
+
     let complianceRules = [];
     if (complianceAddress !== hre.ethers.ZeroAddress) {
       const ComplianceModule = await hre.ethers.getContractFactory("ComplianceModule");
       const compliance = ComplianceModule.attach(complianceAddress);
-      
+
       const rules = await compliance.getRules();
       for (const ruleAddress of rules) {
         try {
@@ -77,7 +79,7 @@ async function generateAssetPage(taskArgs, hre) {
         }
       }
     }
-    
+
     // Build page data
     const pageData = {
       token: {
@@ -87,137 +89,163 @@ async function generateAssetPage(taskArgs, hre) {
         totalSupply: hre.ethers.formatEther(totalSupply),
         maxSupply: hre.ethers.formatEther(maxSupply),
         transfersEnabled: transfersEnabled,
-        owner: owner
+        owner: owner,
       },
       asset: {
         type: assetInfo.assetType,
         framework: assetInfo.regulatoryFramework,
         jurisdiction: assetInfo.jurisdiction,
-        description: assetInfo.description || `Tokenized ${assetInfo.assetType} asset`
+        description: assetInfo.description || `Tokenized ${assetInfo.assetType} asset`,
       },
       compliance: {
         hasModule: complianceAddress !== hre.ethers.ZeroAddress,
         hasIdentityRegistry: identityRegistryAddress !== hre.ethers.ZeroAddress,
         rules: complianceRules,
-        badges: generateBadges(assetInfo.regulatoryFramework, complianceRules.length > 0)
+        badges: generateBadges(assetInfo.regulatoryFramework, complianceRules.length > 0),
       },
       network: hre.network.name,
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     };
-    
+
     // Generate HTML
     const html = generateHTML(pageData, template);
-    
+
     // Save the page
     const pagesDir = path.join(__dirname, "..", "asset-pages");
     if (!fs.existsSync(pagesDir)) {
       fs.mkdirSync(pagesDir, { recursive: true });
     }
-    
+
     const filename = `${tokenSymbol.toLowerCase()}-asset-page.html`;
     const filepath = path.join(pagesDir, filename);
     fs.writeFileSync(filepath, html);
-    
+
     // Also generate a JSON data file
     const jsonFilename = `${tokenSymbol.toLowerCase()}-asset-data.json`;
     const jsonFilepath = path.join(pagesDir, jsonFilename);
     fs.writeFileSync(jsonFilepath, JSON.stringify(pageData, null, 2));
-    
+
     // Generate shareable URLs (these would be real URLs in production)
     const baseUrl = "https://rwa-studio.com/assets";
     const pageUrl = `${baseUrl}/${tokenAddress}`;
     const shareUrl = `${pageUrl}?ref=share`;
     const badgeUrl = `${baseUrl}/badge/${tokenAddress}.svg`;
-    
-    console.log(`\n✅ Asset page generated successfully!`);
-    console.log(`\n📁 Files:`);
+
+    console.log(`\nAsset page generated successfully!`);
+    console.log(`\nFiles:`);
     console.log(`   HTML: ${filepath}`);
     console.log(`   Data: ${jsonFilepath}`);
-    
-    console.log(`\n🌐 URLs (for production deployment):`);
+
+    console.log(`\nURLs (for production deployment):`);
     console.log(`   Page: ${pageUrl}`);
     console.log(`   Share: ${shareUrl}`);
     console.log(`   Badge: ${badgeUrl}`);
-    
-    console.log(`\n🏷️ Embed Badge (copy to investor decks):`);
-    console.log(`   <a href="${pageUrl}"><img src="${badgeUrl}" alt="Verified by RWA-Studio" /></a>`);
-    
+
+    console.log(`\nEmbed Badge (copy to investor decks):`);
+    console.log(
+      `   <a href="${pageUrl}"><img src="${badgeUrl}" alt="Verified by RWA-Studio" /></a>`
+    );
+
     return {
       success: true,
       url: pageUrl,
       shareUrl: shareUrl,
       badgeUrl: badgeUrl,
       filepath: filepath,
-      data: pageData
+      data: pageData,
     };
-    
   } catch (error) {
-    console.error(`\n❌ Error generating asset page:`, error.message);
+    console.error(`\nError generating asset page:`, error.message);
     throw error;
   }
 }
 
 function generateBadges(framework, hasCompliance) {
   const badges = [];
-  
+
   // ERC-3643 badge
   badges.push({
     name: "ERC-3643 Compliant",
-    icon: "🔒",
+    icon: "[lock]",
     color: "#22c55e",
-    description: "Token implements the ERC-3643 standard for compliant security tokens"
+    description: "Token implements the ERC-3643 standard for compliant security tokens",
   });
-  
+
   // Regulatory framework badge
   const frameworkBadges = {
-    "reg-d": { name: "Regulation D", icon: "📜", color: "#3b82f6", description: "SEC Regulation D private placement" },
-    "reg-s": { name: "Regulation S", icon: "🌍", color: "#8b5cf6", description: "SEC Regulation S international offering" },
-    "reg-cf": { name: "Regulation CF", icon: "👥", color: "#f59e0b", description: "SEC Regulation Crowdfunding" },
-    "reg-a": { name: "Regulation A+", icon: "📊", color: "#10b981", description: "SEC Regulation A+ mini-IPO" }
+    "reg-d": {
+      name: "Regulation D",
+      icon: "[doc]",
+      color: "#3b82f6",
+      description: "SEC Regulation D private placement",
+    },
+    "reg-s": {
+      name: "Regulation S",
+      icon: "[globe]",
+      color: "#8b5cf6",
+      description: "SEC Regulation S international offering",
+    },
+    "reg-cf": {
+      name: "Regulation CF",
+      icon: "[users]",
+      color: "#f59e0b",
+      description: "SEC Regulation Crowdfunding",
+    },
+    "reg-a": {
+      name: "Regulation A+",
+      icon: "[chart]",
+      color: "#10b981",
+      description: "SEC Regulation A+ mini-IPO",
+    },
   };
-  
+
   const fwKey = framework.toLowerCase().replace(" ", "-");
   if (fwKey in frameworkBadges) {
     badges.push(frameworkBadges[fwKey]);
   }
-  
+
   // Compliance badge
   if (hasCompliance) {
     badges.push({
       name: "Active Compliance",
-      icon: "✅",
+      icon: "[check]",
       color: "#06b6d4",
-      description: "Token has active compliance rules enforcing transfer restrictions"
+      description: "Token has active compliance rules enforcing transfer restrictions",
     });
   }
-  
+
   // RWA-Studio verification
   badges.push({
     name: "RWA-Studio Verified",
-    icon: "🛡️",
+    icon: "[shield]",
     color: "#6366f1",
-    description: "Token created and verified by RWA-Studio"
+    description: "Token created and verified by RWA-Studio",
   });
-  
+
   return badges;
 }
 
 function generateHTML(data, template) {
   const { token, asset, compliance, network, generatedAt } = data;
-  
+
   // Generate badge HTML
-  const badgeHTML = compliance.badges.map(badge => `
+  const badgeHTML = compliance.badges
+    .map(
+      (badge) => `
     <div class="badge" style="border-color: ${badge.color}">
       <span class="badge-icon">${badge.icon}</span>
       <span class="badge-name">${badge.name}</span>
     </div>
-  `).join("");
-  
+  `
+    )
+    .join("");
+
   // Generate compliance rules HTML
-  const rulesHTML = compliance.rules.length > 0 
-    ? compliance.rules.map(rule => `<li>${rule}</li>`).join("")
-    : "<li>No specific transfer restrictions configured</li>";
-  
+  const rulesHTML =
+    compliance.rules.length > 0
+      ? compliance.rules.map((rule) => `<li>${rule}</li>`).join("")
+      : "<li>No specific transfer restrictions configured</li>";
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -299,7 +327,7 @@ function generateHTML(data, template) {
         <div class="info-grid">
           <div class="info-item">
             <div class="info-label">Asset Type</div>
-            <div class="info-value">${asset.type.replace("-", " ").replace(/\b\w/g, l => l.toUpperCase())}</div>
+            <div class="info-value">${asset.type.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}</div>
           </div>
           <div class="info-item">
             <div class="info-label">Regulatory Framework</div>

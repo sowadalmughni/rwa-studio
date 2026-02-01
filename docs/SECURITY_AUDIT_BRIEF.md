@@ -8,22 +8,22 @@ RWA-Studio is a comprehensive platform for tokenizing Real World Assets (RWA) fo
 
 ### Primary Contracts (In-Scope)
 
-| Contract | LOC | Description | Criticality |
-|----------|-----|-------------|-------------|
-| `RWAToken.sol` | ~400 | Main ERC-3643 compliant security token | 🔴 Critical |
-| `RWATokenFactory.sol` | ~150 | Factory pattern for token deployment | 🔴 Critical |
-| `ComplianceModule.sol` | ~300 | Modular compliance rule engine | 🔴 Critical |
-| `IdentityRegistry.sol` | ~200 | Address verification registry | 🔴 Critical |
+| Contract               | LOC  | Description                            | Criticality |
+| ---------------------- | ---- | -------------------------------------- | ----------- |
+| `RWAToken.sol`         | ~400 | Main ERC-3643 compliant security token | 🔴 Critical |
+| `RWATokenFactory.sol`  | ~150 | Factory pattern for token deployment   | 🔴 Critical |
+| `ComplianceModule.sol` | ~300 | Modular compliance rule engine         | 🔴 Critical |
+| `IdentityRegistry.sol` | ~200 | Address verification registry          | 🔴 Critical |
 
 ### Compliance Rules (In-Scope)
 
-| Contract | LOC | Description | Criticality |
-|----------|-----|-------------|-------------|
-| `InvestorLimitRule.sol` | ~80 | Max investor count enforcement | 🟡 High |
-| `GeographicRule.sol` | ~100 | Jurisdiction-based restrictions | 🟡 High |
-| `AccreditedInvestorRule.sol` | ~90 | Accreditation verification | 🟡 High |
-| `HoldingPeriodRule.sol` | ~85 | Lock-up period enforcement | 🟡 High |
-| `TransferLimitRule.sol` | ~75 | Transfer amount restrictions | 🟡 High |
+| Contract                     | LOC  | Description                     | Criticality |
+| ---------------------------- | ---- | ------------------------------- | ----------- |
+| `InvestorLimitRule.sol`      | ~80  | Max investor count enforcement  | 🟡 High     |
+| `GeographicRule.sol`         | ~100 | Jurisdiction-based restrictions | 🟡 High     |
+| `AccreditedInvestorRule.sol` | ~90  | Accreditation verification      | 🟡 High     |
+| `HoldingPeriodRule.sol`      | ~85  | Lock-up period enforcement      | 🟡 High     |
+| `TransferLimitRule.sol`      | ~75  | Transfer amount restrictions    | 🟡 High     |
 
 ### Interfaces (Reference Only)
 
@@ -76,6 +76,7 @@ RWA-Studio is a comprehensive platform for tokenizing Real World Assets (RWA) fo
 ### 1. Transfer Compliance
 
 All token transfers go through compliance checks:
+
 ```solidity
 function _beforeTokenTransfer(from, to, amount) {
     require(identityRegistry.isVerified(to), "Receiver not verified");
@@ -84,6 +85,7 @@ function _beforeTokenTransfer(from, to, amount) {
 ```
 
 **Audit Focus:**
+
 - Ensure no bypass of compliance checks
 - Verify proper handling of edge cases (zero transfers, self-transfers)
 - Check for reentrancy in transfer hooks
@@ -91,11 +93,13 @@ function _beforeTokenTransfer(from, to, amount) {
 ### 2. Identity Registry
 
 Manages verified investor addresses with:
+
 - Multi-level verification (basic, accredited, institutional)
 - Country code tracking for geographic restrictions
 - Expiration dates for re-verification requirements
 
 **Audit Focus:**
+
 - Access control for verification updates
 - Proper expiration handling
 - Race conditions in batch operations
@@ -103,11 +107,13 @@ Manages verified investor addresses with:
 ### 3. Compliance Rules
 
 Modular rule system allowing:
+
 - Dynamic rule addition/removal
 - Rule-specific parameters per token
 - AND logic (all rules must pass)
 
 **Audit Focus:**
+
 - Rule ordering and priority
 - Parameter validation
 - Gas optimization for multiple rules
@@ -120,6 +126,7 @@ Modular rule system allowing:
 - **Recovery**: Lost wallet recovery
 
 **Audit Focus:**
+
 - Multi-sig requirements for critical operations
 - Event emission for transparency
 - Time-locks for sensitive operations
@@ -130,16 +137,17 @@ Modular rule system allowing:
 
 The following functions have centralization risks by design (required for regulatory compliance):
 
-| Function | Risk | Mitigation |
-|----------|------|------------|
-| `forcedTransfer()` | Admin can move tokens | Requires documented legal basis |
-| `freeze()` | Admin can freeze addresses | Event logs for transparency |
-| `pause()` | Admin can halt all transfers | Multi-sig recommended |
-| `mint()` | Admin can create tokens | Max supply enforced |
+| Function           | Risk                         | Mitigation                      |
+| ------------------ | ---------------------------- | ------------------------------- |
+| `forcedTransfer()` | Admin can move tokens        | Requires documented legal basis |
+| `freeze()`         | Admin can freeze addresses   | Event logs for transparency     |
+| `pause()`          | Admin can halt all transfers | Multi-sig recommended           |
+| `mint()`           | Admin can create tokens      | Max supply enforced             |
 
 ### Upgradeability
 
 Currently, contracts are **not upgradeable**. This is intentional to:
+
 - Prevent admin from changing token behavior
 - Provide regulatory certainty
 - Reduce attack surface

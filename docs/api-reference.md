@@ -38,13 +38,13 @@ POST /auth/register
 
 **Request Body:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `username` | string | Yes | Unique username |
-| `email` | string | Yes | Valid email address |
-| `password` | string | Yes | Min 8 characters |
-| `wallet_address` | string | No | Ethereum address (0x...) |
-| `role` | string | No | User role (default: "user") |
+| Field            | Type   | Required | Description                 |
+| ---------------- | ------ | -------- | --------------------------- |
+| `username`       | string | Yes      | Unique username             |
+| `email`          | string | Yes      | Valid email address         |
+| `password`       | string | Yes      | Min 8 characters            |
+| `wallet_address` | string | No       | Ethereum address (0x...)    |
+| `role`           | string | No       | User role (default: "user") |
 
 **Example Request:**
 
@@ -77,10 +77,10 @@ POST /auth/register
 
 **Error Responses:**
 
-| Code | Description |
-|------|-------------|
-| 400 | Invalid input (missing field, invalid format) |
-| 409 | Username, email, or wallet already exists |
+| Code | Description                                   |
+| ---- | --------------------------------------------- |
+| 400  | Invalid input (missing field, invalid format) |
+| 409  | Username, email, or wallet already exists     |
 
 ---
 
@@ -94,10 +94,10 @@ POST /auth/login
 
 **Request Body:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `email` | string | Yes | Registered email |
-| `password` | string | Yes | User password |
+| Field      | Type   | Required | Description      |
+| ---------- | ------ | -------- | ---------------- |
+| `email`    | string | Yes      | Registered email |
+| `password` | string | Yes      | User password    |
 
 **Example Request:**
 
@@ -136,11 +136,11 @@ POST /auth/wallet-login
 
 **Request Body:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `wallet_address` | string | Yes | Ethereum address |
-| `signature` | string | Yes | Signed message |
-| `message` | string | Yes | Original message that was signed |
+| Field            | Type   | Required | Description                      |
+| ---------------- | ------ | -------- | -------------------------------- |
+| `wallet_address` | string | Yes      | Ethereum address                 |
+| `signature`      | string | Yes      | Signed message                   |
+| `message`        | string | Yes      | Original message that was signed |
 
 **Example Request:**
 
@@ -241,9 +241,9 @@ GET /users/:user_id
 
 **Path Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `user_id` | integer | User ID |
+| Parameter | Type    | Description |
+| --------- | ------- | ----------- |
+| `user_id` | integer | User ID     |
 
 **Example Response (200):**
 
@@ -270,10 +270,10 @@ PUT /users/:user_id
 
 **Request Body:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `username` | string | No | New username |
-| `email` | string | No | New email |
+| Field      | Type   | Required | Description  |
+| ---------- | ------ | -------- | ------------ |
+| `username` | string | No       | New username |
+| `email`    | string | No       | New email    |
 
 ---
 
@@ -303,13 +303,13 @@ GET /transfer-agent/tokens
 
 **Query Parameters:**
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `page` | integer | 1 | Page number |
-| `per_page` | integer | 20 | Items per page |
-| `asset_type` | string | - | Filter by asset type |
-| `regulatory_framework` | string | - | Filter by framework (RegD, RegS, etc.) |
-| `is_active` | boolean | - | Filter by active status |
+| Parameter              | Type    | Default | Description                            |
+| ---------------------- | ------- | ------- | -------------------------------------- |
+| `page`                 | integer | 1       | Page number                            |
+| `per_page`             | integer | 20      | Items per page                         |
+| `asset_type`           | string  | -       | Filter by asset type                   |
+| `regulatory_framework` | string  | -       | Filter by framework (RegD, RegS, etc.) |
+| `is_active`            | boolean | -       | Filter by active status                |
 
 **Example Response (200):**
 
@@ -355,8 +355,8 @@ GET /transfer-agent/tokens/:token_address
 
 **Path Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
+| Parameter       | Type   | Description            |
+| --------------- | ------ | ---------------------- |
 | `token_address` | string | Token contract address |
 
 **Example Response (200):**
@@ -390,9 +390,9 @@ GET /transfer-agent/tokens/:token_address
       }
     ],
     "verification_stats": [
-      {"level": 1, "count": 50},
-      {"level": 2, "count": 30},
-      {"level": 3, "count": 10}
+      { "level": 1, "count": 50 },
+      { "level": 2, "count": 30 },
+      { "level": 3, "count": 10 }
     ],
     "latest_metrics": {
       "total_holders": 90,
@@ -417,19 +417,19 @@ POST /transfer-agent/tokens
 
 **Request Body:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `token_address` | string | Yes | Deployed token address |
-| `token_name` | string | Yes | Token name |
-| `token_symbol` | string | Yes | Token symbol |
-| `asset_type` | string | Yes | Asset type |
-| `regulatory_framework` | string | Yes | Regulatory framework |
-| `jurisdiction` | string | Yes | Primary jurisdiction |
-| `max_supply` | string | Yes | Maximum token supply |
-| `deployer_address` | string | Yes | Deployer wallet |
-| `compliance_address` | string | Yes | Compliance module address |
-| `identity_registry_address` | string | Yes | Identity registry address |
-| `deployment_tx_hash` | string | No | Deployment transaction hash |
+| Field                       | Type   | Required | Description                 |
+| --------------------------- | ------ | -------- | --------------------------- |
+| `token_address`             | string | Yes      | Deployed token address      |
+| `token_name`                | string | Yes      | Token name                  |
+| `token_symbol`              | string | Yes      | Token symbol                |
+| `asset_type`                | string | Yes      | Asset type                  |
+| `regulatory_framework`      | string | Yes      | Regulatory framework        |
+| `jurisdiction`              | string | Yes      | Primary jurisdiction        |
+| `max_supply`                | string | Yes      | Maximum token supply        |
+| `deployer_address`          | string | Yes      | Deployer wallet             |
+| `compliance_address`        | string | Yes      | Compliance module address   |
+| `identity_registry_address` | string | Yes      | Identity registry address   |
+| `deployment_tx_hash`        | string | No       | Deployment transaction hash |
 
 **Example Request:**
 
@@ -460,13 +460,13 @@ POST /transfer-agent/tokens/:token_address/verify
 
 **Request Body:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `investor_address` | string | Yes | Wallet to verify |
-| `verification_level` | integer | Yes | KYC level (1-3) |
-| `country` | string | Yes | Investor country (2-letter code) |
-| `is_accredited` | boolean | No | Accreditation status |
-| `expiry_date` | string | No | Verification expiry (ISO date) |
+| Field                | Type    | Required | Description                      |
+| -------------------- | ------- | -------- | -------------------------------- |
+| `investor_address`   | string  | Yes      | Wallet to verify                 |
+| `verification_level` | integer | Yes      | KYC level (1-3)                  |
+| `country`            | string  | Yes      | Investor country (2-letter code) |
+| `is_accredited`      | boolean | No       | Accreditation status             |
+| `expiry_date`        | string  | No       | Verification expiry (ISO date)   |
 
 ---
 
@@ -480,12 +480,12 @@ GET /transfer-agent/tokens/:token_address/verified
 
 **Query Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `page` | integer | Page number |
-| `per_page` | integer | Items per page |
-| `verification_level` | integer | Filter by level |
-| `is_active` | boolean | Filter by active status |
+| Parameter            | Type    | Description             |
+| -------------------- | ------- | ----------------------- |
+| `page`               | integer | Page number             |
+| `per_page`           | integer | Items per page          |
+| `verification_level` | integer | Filter by level         |
+| `is_active`          | boolean | Filter by active status |
 
 ---
 
@@ -499,13 +499,13 @@ GET /transfer-agent/tokens/:token_address/events
 
 **Query Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `page` | integer | Page number |
-| `per_page` | integer | Items per page |
-| `event_type` | string | Filter by event type |
-| `start_date` | string | Filter from date |
-| `end_date` | string | Filter to date |
+| Parameter    | Type    | Description          |
+| ------------ | ------- | -------------------- |
+| `page`       | integer | Page number          |
+| `per_page`   | integer | Items per page       |
+| `event_type` | string  | Filter by event type |
+| `start_date` | string  | Filter from date     |
+| `end_date`   | string  | Filter to date       |
 
 ---
 
@@ -521,14 +521,14 @@ POST /api/kyc/start
 
 **Request Body:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `wallet_address` | string | Yes | Wallet to verify |
-| `first_name` | string | Yes | Legal first name |
-| `last_name` | string | Yes | Legal last name |
-| `email` | string | Yes | Contact email |
-| `country` | string | No | Country code |
-| `date_of_birth` | string | No | DOB (YYYY-MM-DD) |
+| Field            | Type   | Required | Description      |
+| ---------------- | ------ | -------- | ---------------- |
+| `wallet_address` | string | Yes      | Wallet to verify |
+| `first_name`     | string | Yes      | Legal first name |
+| `last_name`      | string | Yes      | Legal last name  |
+| `email`          | string | Yes      | Contact email    |
+| `country`        | string | No       | Country code     |
+| `date_of_birth`  | string | No       | DOB (YYYY-MM-DD) |
 
 **Example Request:**
 
@@ -691,11 +691,11 @@ POST /api/billing/checkout
 
 **Request Body:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `plan_id` | string | Yes | Plan to subscribe to |
-| `success_url` | string | Yes | Redirect URL on success |
-| `cancel_url` | string | Yes | Redirect URL on cancel |
+| Field         | Type   | Required | Description             |
+| ------------- | ------ | -------- | ----------------------- |
+| `plan_id`     | string | Yes      | Plan to subscribe to    |
+| `success_url` | string | Yes      | Redirect URL on success |
+| `cancel_url`  | string | Yes      | Redirect URL on cancel  |
 
 **Example Response (200):**
 
@@ -750,11 +750,11 @@ GET /assets/:token_address
 
 **Query Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `ref` | string | Referral code |
-| `utm_source` | string | UTM source tracking |
-| `utm_medium` | string | UTM medium tracking |
+| Parameter      | Type   | Description           |
+| -------------- | ------ | --------------------- |
+| `ref`          | string | Referral code         |
+| `utm_source`   | string | UTM source tracking   |
+| `utm_medium`   | string | UTM medium tracking   |
 | `utm_campaign` | string | UTM campaign tracking |
 
 **Example Response (200):**
@@ -809,8 +809,8 @@ GET /assets/:token_address/html
 
 **Query Parameters:**
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
+| Parameter  | Type   | Default | Description   |
+| ---------- | ------ | ------- | ------------- |
 | `template` | string | default | Template name |
 
 **Response:** HTML content with `Content-Type: text/html`
@@ -862,12 +862,12 @@ POST /documents/upload
 
 **Form Fields:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `file` | file | Yes | Document file |
-| `token_address` | string | Yes | Associated token |
-| `document_type` | string | Yes | Type (ppm, subscription, etc.) |
-| `title` | string | No | Document title |
+| Field           | Type   | Required | Description                    |
+| --------------- | ------ | -------- | ------------------------------ |
+| `file`          | file   | Yes      | Document file                  |
+| `token_address` | string | Yes      | Associated token               |
+| `document_type` | string | Yes      | Type (ppm, subscription, etc.) |
+| `title`         | string | No       | Document title                 |
 
 ---
 
@@ -893,12 +893,12 @@ GET /analytics/export
 
 **Query Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `token_address` | string | Filter by token |
-| `start_date` | string | Start date |
-| `end_date` | string | End date |
-| `format` | string | Export format (csv, json) |
+| Parameter       | Type   | Description               |
+| --------------- | ------ | ------------------------- |
+| `token_address` | string | Filter by token           |
+| `start_date`    | string | Start date                |
+| `end_date`      | string | End date                  |
+| `format`        | string | Export format (csv, json) |
 
 ---
 
@@ -914,10 +914,10 @@ GET /badge/:token_address
 
 **Query Parameters:**
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `style` | string | default | Badge style |
-| `size` | string | medium | Badge size (small, medium, large) |
+| Parameter | Type   | Default | Description                       |
+| --------- | ------ | ------- | --------------------------------- |
+| `style`   | string | default | Badge style                       |
+| `size`    | string | medium  | Badge size (small, medium, large) |
 
 **Response:** SVG image with `Content-Type: image/svg+xml`
 
@@ -938,28 +938,28 @@ All errors follow a consistent format:
 
 ### HTTP Status Codes
 
-| Code | Description |
-|------|-------------|
-| 200 | Success |
-| 201 | Created |
-| 204 | No Content |
-| 400 | Bad Request - Invalid input |
-| 401 | Unauthorized - Missing or invalid token |
-| 403 | Forbidden - Insufficient permissions |
-| 404 | Not Found - Resource doesn't exist |
-| 409 | Conflict - Resource already exists |
-| 429 | Too Many Requests - Rate limit exceeded |
-| 500 | Internal Server Error |
+| Code | Description                             |
+| ---- | --------------------------------------- |
+| 200  | Success                                 |
+| 201  | Created                                 |
+| 204  | No Content                              |
+| 400  | Bad Request - Invalid input             |
+| 401  | Unauthorized - Missing or invalid token |
+| 403  | Forbidden - Insufficient permissions    |
+| 404  | Not Found - Resource doesn't exist      |
+| 409  | Conflict - Resource already exists      |
+| 429  | Too Many Requests - Rate limit exceeded |
+| 500  | Internal Server Error                   |
 
 ### Rate Limiting
 
 API requests are rate limited:
 
-| Endpoint Type | Limit |
-|---------------|-------|
-| Authentication | 5 requests/minute |
-| General API | 100 requests/minute |
-| Webhook | 1000 requests/minute |
+| Endpoint Type  | Limit                |
+| -------------- | -------------------- |
+| Authentication | 5 requests/minute    |
+| General API    | 100 requests/minute  |
+| Webhook        | 1000 requests/minute |
 
 Rate limit headers are included in responses:
 
@@ -997,22 +997,22 @@ tokens = response.json()
 ### JavaScript
 
 ```javascript
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = "http://localhost:5000/api";
 
 // Login
 const loginResponse = await fetch(`${BASE_URL}/auth/login`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    email: 'user@example.com',
-    password: 'password123'
-  })
+    email: "user@example.com",
+    password: "password123",
+  }),
 });
 const { access_token } = await loginResponse.json();
 
 // Get tokens
 const tokensResponse = await fetch(`${BASE_URL}/transfer-agent/tokens`, {
-  headers: { 'Authorization': `Bearer ${access_token}` }
+  headers: { Authorization: `Bearer ${access_token}` },
 });
 const tokens = await tokensResponse.json();
 ```

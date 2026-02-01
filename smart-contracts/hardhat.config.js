@@ -5,7 +5,7 @@ require("@nomicfoundation/hardhat-toolbox");
 /**
  * Verify Address Task
  * Adds a verified address to the identity registry
- * 
+ *
  * Usage: npx hardhat verify-address --token <address> --address <address> --level <level> --jurisdiction <code>
  */
 task("verify-address", "Add a verified address to the identity registry")
@@ -22,7 +22,7 @@ task("verify-address", "Add a verified address to the identity registry")
 /**
  * Compliance Check Task
  * Checks if a proposed transfer would pass all compliance rules
- * 
+ *
  * Usage: npx hardhat compliance-check --token <address> --from <address> --to <address> --amount <amount>
  */
 task("compliance-check", "Check if a transfer would pass compliance")
@@ -38,12 +38,15 @@ task("compliance-check", "Check if a transfer would pass compliance")
 /**
  * Add Compliance Rule Task
  * Deploys and adds a compliance rule to a token
- * 
+ *
  * Usage: npx hardhat add-compliance-rule --token <address> --rule <type> [--params <params>]
  */
 task("add-compliance-rule", "Deploy and add a compliance rule to a token")
   .addParam("token", "The RWA token contract address")
-  .addParam("rule", "Rule type: investor-limit, geographic, accredited, holding-period, transfer-limit")
+  .addParam(
+    "rule",
+    "Rule type: investor-limit, geographic, accredited, holding-period, transfer-limit"
+  )
   .addOptionalVariadicPositionalParam("params", "Rule-specific parameters")
   .setAction(async (taskArgs, hre) => {
     const { addComplianceRule } = require("./scripts/add-compliance-rule");
@@ -53,7 +56,7 @@ task("add-compliance-rule", "Deploy and add a compliance rule to a token")
 /**
  * Generate Report Task
  * Generates compliance reports for RWA tokens
- * 
+ *
  * Usage: npx hardhat generate-report --token <address> [--format json|csv|pdf] [--period 30]
  */
 task("generate-report", "Generate a compliance report for a token")
@@ -68,7 +71,7 @@ task("generate-report", "Generate a compliance report for a token")
 /**
  * Generate Asset Page Task
  * Generates shareable asset pages with compliance badges
- * 
+ *
  * Usage: npx hardhat generate-asset-page --token <address> [--template default|premium|minimal]
  */
 task("generate-asset-page", "Generate a shareable asset page for a token")
@@ -88,38 +91,38 @@ module.exports = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200
-      }
-    }
+        runs: 200,
+      },
+    },
   },
   networks: {
     hardhat: {
-      chainId: 31337
+      chainId: 31337,
     },
     // Localhost for testing
     localhost: {
-      url: "http://127.0.0.1:8545"
+      url: "http://127.0.0.1:8545",
     },
     // Sepolia testnet (configure with env vars in production)
     sepolia: {
       url: process.env.SEPOLIA_RPC_URL || "",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : []
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
     // Polygon Amoy testnet
     amoy: {
       url: process.env.AMOY_RPC_URL || "",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : []
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
     // Mainnet (use with caution)
     mainnet: {
       url: process.env.MAINNET_RPC_URL || "",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : []
-    }
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+    },
   },
   paths: {
     sources: "./contracts",
     tests: "./test",
     cache: "./cache",
-    artifacts: "./artifacts"
-  }
+    artifacts: "./artifacts",
+  },
 };

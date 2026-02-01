@@ -47,10 +47,10 @@ npm run report
 ## Writing Tests
 
 ```javascript
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test('example test', async ({ page }) => {
-  await page.goto('/');
+test("example test", async ({ page }) => {
+  await page.goto("/");
   await expect(page).toHaveTitle(/RWA/);
 });
 ```
@@ -58,6 +58,7 @@ test('example test', async ({ page }) => {
 ## CI Integration
 
 Tests are configured to:
+
 - Retry failed tests twice on CI
 - Run with a single worker on CI
 - Capture screenshots and traces on failure

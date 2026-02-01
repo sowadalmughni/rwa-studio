@@ -3,36 +3,29 @@
  * Pie chart showing investor distribution by jurisdiction/type
  */
 
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Legend,
-  Tooltip,
-} from 'recharts';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Sample data
 const jurisdictionData = [
-  { name: 'United States', value: 45, color: '#6366f1' },
-  { name: 'United Kingdom', value: 20, color: '#8b5cf6' },
-  { name: 'Germany', value: 15, color: '#a855f7' },
-  { name: 'Singapore', value: 12, color: '#d946ef' },
-  { name: 'Other', value: 8, color: '#ec4899' },
+  { name: "United States", value: 45, color: "#6366f1" },
+  { name: "United Kingdom", value: 20, color: "#8b5cf6" },
+  { name: "Germany", value: 15, color: "#a855f7" },
+  { name: "Singapore", value: 12, color: "#d946ef" },
+  { name: "Other", value: 8, color: "#ec4899" },
 ];
 
 const investorTypeData = [
-  { name: 'Accredited', value: 55, color: '#22c55e' },
-  { name: 'Institutional', value: 30, color: '#3b82f6' },
-  { name: 'Retail', value: 15, color: '#f59e0b' },
+  { name: "Accredited", value: 55, color: "#22c55e" },
+  { name: "Institutional", value: 30, color: "#3b82f6" },
+  { name: "Retail", value: 15, color: "#f59e0b" },
 ];
 
 const verificationLevelData = [
-  { name: 'Level 3 (Full)', value: 60, color: '#22c55e' },
-  { name: 'Level 2 (Document)', value: 30, color: '#3b82f6' },
-  { name: 'Level 1 (Basic)', value: 10, color: '#f59e0b' },
+  { name: "Level 3 (Full)", value: 60, color: "#22c55e" },
+  { name: "Level 2 (Document)", value: 30, color: "#3b82f6" },
+  { name: "Level 1 (Basic)", value: 10, color: "#f59e0b" },
 ];
 
 const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
@@ -77,18 +70,16 @@ export function InvestorDistribution() {
           </Pie>
           <Tooltip
             contentStyle={{
-              backgroundColor: 'hsl(var(--background))',
-              border: '1px solid hsl(var(--border))',
-              borderRadius: '8px',
+              backgroundColor: "hsl(var(--background))",
+              border: "1px solid hsl(var(--border))",
+              borderRadius: "8px",
             }}
             formatter={(value, name) => [`${value}%`, name]}
           />
           <Legend
             verticalAlign="bottom"
             height={36}
-            formatter={(value) => (
-              <span className="text-sm text-muted-foreground">{value}</span>
-            )}
+            formatter={(value) => <span className="text-sm text-muted-foreground">{value}</span>}
           />
         </PieChart>
       </ResponsiveContainer>
@@ -99,9 +90,7 @@ export function InvestorDistribution() {
     <Card>
       <CardHeader>
         <CardTitle>Investor Distribution</CardTitle>
-        <CardDescription>
-          Breakdown of verified investors
-        </CardDescription>
+        <CardDescription>Breakdown of verified investors</CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="jurisdiction" className="space-y-4">
@@ -110,18 +99,12 @@ export function InvestorDistribution() {
             <TabsTrigger value="type">Investor Type</TabsTrigger>
             <TabsTrigger value="verification">Verification</TabsTrigger>
           </TabsList>
-          
-          <TabsContent value="jurisdiction">
-            {renderPieChart(jurisdictionData)}
-          </TabsContent>
-          
-          <TabsContent value="type">
-            {renderPieChart(investorTypeData)}
-          </TabsContent>
-          
-          <TabsContent value="verification">
-            {renderPieChart(verificationLevelData)}
-          </TabsContent>
+
+          <TabsContent value="jurisdiction">{renderPieChart(jurisdictionData)}</TabsContent>
+
+          <TabsContent value="type">{renderPieChart(investorTypeData)}</TabsContent>
+
+          <TabsContent value="verification">{renderPieChart(verificationLevelData)}</TabsContent>
         </Tabs>
       </CardContent>
     </Card>

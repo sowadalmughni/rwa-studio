@@ -3,88 +3,99 @@
  * Main dashboard view with all analytics components
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { Coins, Users, Shield, TrendingUp, Activity, FileCheck, Download, RefreshCw, Eye, Share2 } from 'lucide-react';
-import { StatCard } from './StatCard';
-import { TokenMetricsChart } from './TokenMetricsChart';
-import { ComplianceOverview } from './ComplianceOverview';
-import { InvestorDistribution } from './InvestorDistribution';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
+import { useState, useEffect, useCallback } from "react";
+import {
+  Coins,
+  Users,
+  Shield,
+  TrendingUp,
+  Activity,
+  FileCheck,
+  Download,
+  RefreshCw,
+  Eye,
+  Share2,
+} from "lucide-react";
+import { StatCard } from "./StatCard";
+import { TokenMetricsChart } from "./TokenMetricsChart";
+import { ComplianceOverview } from "./ComplianceOverview";
+import { InvestorDistribution } from "./InvestorDistribution";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-  DropdownMenuLabel
-} from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function AnalyticsDashboard({ tokenAddress }) {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
-  const [timeRange, setTimeRange] = useState('30d');
+  const [timeRange, setTimeRange] = useState("30d");
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
 
   const loadAnalytics = useCallback(async () => {
     setLoading(true);
-    
+
     try {
       // In production, this would fetch from API
       // const response = await fetch(`/api/transfer-agent/tokens/${tokenAddress}/metrics?period=${timeRange}`);
       // const data = await response.json();
-      
+
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      
+
       setStats({
         totalTokens: 5,
-        totalTokensTrend: 'up',
-        totalTokensTrendValue: '+2 this month',
-        
+        totalTokensTrend: "up",
+        totalTokensTrendValue: "+2 this month",
+
         verifiedInvestors: 127,
-        verifiedInvestorsTrend: 'up',
-        verifiedInvestorsTrendValue: '+12.5%',
-        
-        complianceRate: '98.5%',
-        complianceRateTrend: 'up',
-        complianceRateTrendValue: '+0.5%',
-        
-        totalVolume: '$2.4M',
-        totalVolumeTrend: 'up',
-        totalVolumeTrendValue: '+15.3%',
-        
+        verifiedInvestorsTrend: "up",
+        verifiedInvestorsTrendValue: "+12.5%",
+
+        complianceRate: "98.5%",
+        complianceRateTrend: "up",
+        complianceRateTrendValue: "+0.5%",
+
+        totalVolume: "$2.4M",
+        totalVolumeTrend: "up",
+        totalVolumeTrendValue: "+15.3%",
+
         activeTransfers: 42,
-        activeTransfersTrend: 'neutral',
-        activeTransfersTrendValue: '',
-        
+        activeTransfersTrend: "neutral",
+        activeTransfersTrendValue: "",
+
         pendingVerifications: 8,
-        pendingVerificationsTrend: 'down',
-        pendingVerificationsTrendValue: '-3',
+        pendingVerificationsTrend: "down",
+        pendingVerificationsTrendValue: "-3",
 
         // Growth KPIs
         pageViews: 1247,
-        pageViewsTrend: 'up',
-        pageViewsTrendValue: '+23.4%',
+        pageViewsTrend: "up",
+        pageViewsTrendValue: "+23.4%",
 
         shareCount: 89,
-        shareCountTrend: 'up',
-        shareCountTrendValue: '+15 this week',
+        shareCountTrend: "up",
+        shareCountTrendValue: "+15 this week",
 
         badgeImpressions: 3420,
-        badgeImpressionsTrend: 'up',
-        badgeImpressionsTrendValue: '+8.2%',
+        badgeImpressionsTrend: "up",
+        badgeImpressionsTrendValue: "+8.2%",
 
         referralConversions: 12,
-        referralConversionsTrend: 'up',
-        referralConversionsTrendValue: '+3'
+        referralConversionsTrend: "up",
+        referralConversionsTrendValue: "+3",
       });
-      
+
       setLastUpdated(new Date());
     } catch (error) {
-      console.error('Failed to load analytics:', error);
+      console.error("Failed to load analytics:", error);
     } finally {
       setLoading(false);
     }
@@ -96,9 +107,12 @@ export function AnalyticsDashboard({ tokenAddress }) {
 
   // Polling for real-time updates (every 5 minutes)
   useEffect(() => {
-    const interval = setInterval(() => {
-      loadAnalytics();
-    }, 5 * 60 * 1000);
+    const interval = setInterval(
+      () => {
+        loadAnalytics();
+      },
+      5 * 60 * 1000
+    );
 
     return () => clearInterval(interval);
   }, [loadAnalytics]);
@@ -112,31 +126,31 @@ export function AnalyticsDashboard({ tokenAddress }) {
   const handleExport = async (format) => {
     try {
       const response = await fetch(
-        `/api/analytics/export/${tokenAddress}?format=${format}&days=${timeRange.replace('d', '')}&type=all`,
+        `/api/analytics/export/${tokenAddress}?format=${format}&days=${timeRange.replace("d", "")}&type=all`,
         {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
       );
-      
-      if (format === 'json') {
+
+      if (format === "json") {
         const data = await response.json();
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
         downloadBlob(blob, `analytics-${tokenAddress}-${format}.json`);
       } else {
         const blob = await response.blob();
-        const extension = format === 'pdf' ? 'md' : format;
+        const extension = format === "pdf" ? "md" : format;
         downloadBlob(blob, `analytics-${tokenAddress}.${extension}`);
       }
     } catch (error) {
-      console.error('Export failed:', error);
+      console.error("Export failed:", error);
     }
   };
 
   const downloadBlob = (blob, filename) => {
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = filename;
     document.body.appendChild(a);
@@ -175,13 +189,8 @@ export function AnalyticsDashboard({ tokenAddress }) {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleRefresh}
-            disabled={refreshing}
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+          <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
             Refresh
           </Button>
           <DropdownMenu>
@@ -194,13 +203,13 @@ export function AnalyticsDashboard({ tokenAddress }) {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Export Format</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleExport('csv')}>
+              <DropdownMenuItem onClick={() => handleExport("csv")}>
                 📊 Export as CSV
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleExport('json')}>
+              <DropdownMenuItem onClick={() => handleExport("json")}>
                 📋 Export as JSON
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleExport('pdf')}>
+              <DropdownMenuItem onClick={() => handleExport("pdf")}>
                 📄 Export as Report (MD)
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -280,7 +289,9 @@ export function AnalyticsDashboard({ tokenAddress }) {
           <div className="grid gap-4 md:grid-cols-3">
             <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
               <div className="text-sm text-blue-600 font-medium">Badge Impressions</div>
-              <div className="text-2xl font-bold text-blue-900">{stats.badgeImpressions?.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-blue-900">
+                {stats.badgeImpressions?.toLocaleString()}
+              </div>
               <div className="text-xs text-blue-600">{stats.badgeImpressionsTrendValue}</div>
             </div>
             <div className="p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
@@ -298,10 +309,7 @@ export function AnalyticsDashboard({ tokenAddress }) {
       </Card>
 
       {/* Token Metrics Chart */}
-      <TokenMetricsChart
-        timeRange={timeRange}
-        onTimeRangeChange={setTimeRange}
-      />
+      <TokenMetricsChart timeRange={timeRange} onTimeRangeChange={setTimeRange} />
 
       {/* Bottom Row */}
       <div className="grid gap-6 lg:grid-cols-2">

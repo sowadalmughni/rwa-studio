@@ -2,4 +2,4 @@
  * Wallet Components Export
  */
 
-export { ConnectWallet } from './ConnectWallet';
+export { ConnectWallet } from "./ConnectWallet";

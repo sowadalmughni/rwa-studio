@@ -10,7 +10,12 @@
     "node": "hardhat node",
     "deploy:local": "hardhat rwa:deploy --network localhost"
   },
-  "keywords": ["rwa", "tokenization", "erc-3643", "security-token"],
+  "keywords": [
+    "rwa",
+    "tokenization",
+    "erc-3643",
+    "security-token"
+  ],
   "author": "Sowad Al-Mughni <sowadalmughni@gmail.com>",
   "license": "MIT",
   "description": "ERC-3643 compliant smart contracts for RWA tokenization",

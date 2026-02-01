@@ -1,0 +1,47 @@
+[project]
+name = "rwa-studio-backend"
+version = "1.0.0"
+description = "RWA-Studio Transfer Agent Backend"
+requires-python = ">=3.10"
+
+[tool.black]
+line-length = 120
+target-version = ['py310', 'py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+    \.git
+    | \.venv
+    | venv
+    | __pycache__
+    | htmlcov
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 120
+skip = [".venv", "venv", "__pycache__"]
+
+[tool.flake8]
+max-line-length = 120
+extend-ignore = ["E501", "W503"]
+exclude = [".venv", "venv", "__pycache__", "htmlcov"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["*/__pycache__/*", "*/tests/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

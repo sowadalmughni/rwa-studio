@@ -1,14 +1,14 @@
 /**
  * useWallet Hook for RWA-Studio
- * 
+ *
  * Custom hook that provides wallet state and authentication functions
  */
 
-import { useAccount, useDisconnect, useChainId, useSignMessage, useSwitchChain } from 'wagmi';
-import { useConnectModal, useAccountModal, useChainModal } from '@rainbow-me/rainbowkit';
-import { useState, useCallback, useEffect } from 'react';
+import { useAccount, useDisconnect, useChainId, useSignMessage, useSwitchChain } from "wagmi";
+import { useConnectModal, useAccountModal, useChainModal } from "@rainbow-me/rainbowkit";
+import { useState, useCallback, useEffect } from "react";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 /**
  * Hook for wallet authentication and state management
@@ -23,9 +23,7 @@ export function useWallet() {
   const { openAccountModal } = useAccountModal();
   const { openChainModal } = useChainModal();
 
-  const [authToken, setAuthToken] = useState(() => 
-    localStorage.getItem('rwa_studio_token')
-  );
+  const [authToken, setAuthToken] = useState(() => localStorage.getItem("rwa_studio_token"));
   const [user, setUser] = useState(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [error, setError] = useState(null);
@@ -51,10 +49,10 @@ export function useWallet() {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/me`, {
         headers: {
-          'Authorization': `Bearer ${authToken}`,
+          Authorization: `Bearer ${authToken}`,
         },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
@@ -65,7 +63,7 @@ export function useWallet() {
         logout();
       }
     } catch (err) {
-      console.error('Failed to fetch user:', err);
+      console.error("Failed to fetch user:", err);
     }
   };
 
@@ -74,7 +72,7 @@ export function useWallet() {
    */
   const authenticateWithWallet = useCallback(async () => {
     if (!address) {
-      setError('Wallet not connected');
+      setError("Wallet not connected");
       return null;
     }
 
@@ -87,11 +85,11 @@ export function useWallet() {
       // 2. Sign the nonce with the wallet
       // 3. Verify the signature on the server
       // For now, we use a simplified approach
-      
+
       const response = await fetch(`${API_BASE_URL}/auth/login/wallet`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           wallet_address: address,
@@ -104,15 +102,15 @@ export function useWallet() {
       if (data.success) {
         setAuthToken(data.data.access_token);
         setUser(data.data.user);
-        localStorage.setItem('rwa_studio_token', data.data.access_token);
-        localStorage.setItem('rwa_studio_refresh_token', data.data.refresh_token);
+        localStorage.setItem("rwa_studio_token", data.data.access_token);
+        localStorage.setItem("rwa_studio_refresh_token", data.data.refresh_token);
         return data.data;
       } else {
-        setError(data.error || 'Authentication failed');
+        setError(data.error || "Authentication failed");
         return null;
       }
     } catch (err) {
-      setError(err.message || 'Network error');
+      setError(err.message || "Network error");
       return null;
     } finally {
       setIsAuthenticating(false);
@@ -127,7 +125,7 @@ export function useWallet() {
       openConnectModal?.();
       return;
     }
-    
+
     return authenticateWithWallet();
   }, [isConnected, openConnectModal, authenticateWithWallet]);
 
@@ -139,19 +137,19 @@ export function useWallet() {
       if (authToken) {
         // Notify server about logout
         await fetch(`${API_BASE_URL}/auth/logout`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Authorization': `Bearer ${authToken}`,
+            Authorization: `Bearer ${authToken}`,
           },
         });
       }
     } catch (err) {
-      console.error('Logout error:', err);
+      console.error("Logout error:", err);
     } finally {
       setAuthToken(null);
       setUser(null);
-      localStorage.removeItem('rwa_studio_token');
-      localStorage.removeItem('rwa_studio_refresh_token');
+      localStorage.removeItem("rwa_studio_token");
+      localStorage.removeItem("rwa_studio_refresh_token");
       disconnect();
     }
   }, [authToken, disconnect]);
@@ -160,14 +158,14 @@ export function useWallet() {
    * Refresh access token
    */
   const refreshToken = useCallback(async () => {
-    const refreshToken = localStorage.getItem('rwa_studio_refresh_token');
+    const refreshToken = localStorage.getItem("rwa_studio_refresh_token");
     if (!refreshToken) return null;
 
     try {
       const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${refreshToken}`,
+          Authorization: `Bearer ${refreshToken}`,
         },
       });
 
@@ -175,14 +173,14 @@ export function useWallet() {
 
       if (data.success) {
         setAuthToken(data.data.access_token);
-        localStorage.setItem('rwa_studio_token', data.data.access_token);
+        localStorage.setItem("rwa_studio_token", data.data.access_token);
         return data.data.access_token;
       } else {
         logout();
         return null;
       }
     } catch (err) {
-      console.error('Token refresh failed:', err);
+      console.error("Token refresh failed:", err);
       logout();
       return null;
     }
@@ -191,34 +189,38 @@ export function useWallet() {
   /**
    * Sign a message with the connected wallet
    */
-  const signMessage = useCallback(async (message) => {
-    try {
-      return await signMessageAsync({ message });
-    } catch (err) {
-      setError(err.message);
-      return null;
-    }
-  }, [signMessageAsync]);
+  const signMessage = useCallback(
+    async (message) => {
+      try {
+        return await signMessageAsync({ message });
+      } catch (err) {
+        setError(err.message);
+        return null;
+      }
+    },
+    [signMessageAsync]
+  );
 
   /**
    * Switch to a different chain
    */
-  const switchChain = useCallback(async (targetChainId) => {
-    try {
-      await switchChainAsync({ chainId: targetChainId });
-      return true;
-    } catch (err) {
-      setError(err.message);
-      return false;
-    }
-  }, [switchChainAsync]);
+  const switchChain = useCallback(
+    async (targetChainId) => {
+      try {
+        await switchChainAsync({ chainId: targetChainId });
+        return true;
+      } catch (err) {
+        setError(err.message);
+        return false;
+      }
+    },
+    [switchChainAsync]
+  );
 
   /**
    * Get shortened address for display
    */
-  const shortenedAddress = address
-    ? `${address.slice(0, 6)}...${address.slice(-4)}`
-    : null;
+  const shortenedAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : null;
 
   return {
     // Wallet state
@@ -228,14 +230,14 @@ export function useWallet() {
     isConnecting,
     chainId,
     connector,
-    
+
     // Auth state
     authToken,
     user,
     isAuthenticated: !!authToken && !!user,
     isAuthenticating,
     error,
-    
+
     // Actions
     connectAndAuthenticate,
     authenticateWithWallet,
@@ -243,12 +245,12 @@ export function useWallet() {
     refreshToken,
     signMessage,
     switchChain,
-    
+
     // Modal openers
     openConnectModal,
     openAccountModal,
     openChainModal,
-    
+
     // Clear error
     clearError: () => setError(null),
   };

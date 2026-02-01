@@ -1,168 +1,172 @@
 /**
  * Button Component Tests
  * Author: Sowad Al-Mughni
- * 
+ *
  * Tests for the Button component variants and interactions
  */
 
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
-import { Button } from './button'
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { Button } from "./button";
 
-describe('Button Component', () => {
-  describe('Rendering', () => {
-    it('renders with default props', () => {
-      render(<Button>Click me</Button>)
-      
-      const button = screen.getByRole('button', { name: /click me/i })
-      expect(button).toBeInTheDocument()
-    })
+describe("Button Component", () => {
+  describe("Rendering", () => {
+    it("renders with default props", () => {
+      render(<Button>Click me</Button>);
 
-    it('renders children correctly', () => {
-      render(<Button>Test Content</Button>)
-      
-      expect(screen.getByText('Test Content')).toBeInTheDocument()
-    })
+      const button = screen.getByRole("button", { name: /click me/i });
+      expect(button).toBeInTheDocument();
+    });
 
-    it('renders with data-slot attribute', () => {
-      render(<Button>Test</Button>)
-      
-      const button = screen.getByRole('button')
-      expect(button).toHaveAttribute('data-slot', 'button')
-    })
-  })
+    it("renders children correctly", () => {
+      render(<Button>Test Content</Button>);
 
-  describe('Variants', () => {
-    it('renders default variant', () => {
-      render(<Button variant="default">Default</Button>)
-      
-      const button = screen.getByRole('button')
-      expect(button).toHaveClass('bg-primary')
-    })
+      expect(screen.getByText("Test Content")).toBeInTheDocument();
+    });
 
-    it('renders destructive variant', () => {
-      render(<Button variant="destructive">Delete</Button>)
-      
-      const button = screen.getByRole('button')
-      expect(button).toHaveClass('bg-destructive')
-    })
+    it("renders with data-slot attribute", () => {
+      render(<Button>Test</Button>);
 
-    it('renders outline variant', () => {
-      render(<Button variant="outline">Outline</Button>)
-      
-      const button = screen.getByRole('button')
-      expect(button).toHaveClass('border')
-    })
+      const button = screen.getByRole("button");
+      expect(button).toHaveAttribute("data-slot", "button");
+    });
+  });
 
-    it('renders secondary variant', () => {
-      render(<Button variant="secondary">Secondary</Button>)
-      
-      const button = screen.getByRole('button')
-      expect(button).toHaveClass('bg-secondary')
-    })
+  describe("Variants", () => {
+    it("renders default variant", () => {
+      render(<Button variant="default">Default</Button>);
 
-    it('renders ghost variant', () => {
-      render(<Button variant="ghost">Ghost</Button>)
-      
-      const button = screen.getByRole('button')
-      expect(button).toHaveClass('hover:bg-accent')
-    })
+      const button = screen.getByRole("button");
+      expect(button).toHaveClass("bg-primary");
+    });
 
-    it('renders link variant', () => {
-      render(<Button variant="link">Link</Button>)
-      
-      const button = screen.getByRole('button')
-      expect(button).toHaveClass('text-primary')
-    })
-  })
+    it("renders destructive variant", () => {
+      render(<Button variant="destructive">Delete</Button>);
 
-  describe('Sizes', () => {
-    it('renders default size', () => {
-      render(<Button size="default">Default Size</Button>)
-      
-      const button = screen.getByRole('button')
-      expect(button).toHaveClass('h-9')
-    })
+      const button = screen.getByRole("button");
+      expect(button).toHaveClass("bg-destructive");
+    });
 
-    it('renders small size', () => {
-      render(<Button size="sm">Small</Button>)
-      
-      const button = screen.getByRole('button')
-      expect(button).toHaveClass('h-8')
-    })
+    it("renders outline variant", () => {
+      render(<Button variant="outline">Outline</Button>);
 
-    it('renders large size', () => {
-      render(<Button size="lg">Large</Button>)
-      
-      const button = screen.getByRole('button')
-      expect(button).toHaveClass('h-10')
-    })
+      const button = screen.getByRole("button");
+      expect(button).toHaveClass("border");
+    });
 
-    it('renders icon size', () => {
-      render(<Button size="icon">🔍</Button>)
-      
-      const button = screen.getByRole('button')
-      expect(button).toHaveClass('size-9')
-    })
-  })
+    it("renders secondary variant", () => {
+      render(<Button variant="secondary">Secondary</Button>);
 
-  describe('States', () => {
-    it('handles disabled state', () => {
-      render(<Button disabled>Disabled</Button>)
-      
-      const button = screen.getByRole('button')
-      expect(button).toBeDisabled()
-    })
+      const button = screen.getByRole("button");
+      expect(button).toHaveClass("bg-secondary");
+    });
 
-    it('applies disabled styles', () => {
-      render(<Button disabled>Disabled</Button>)
-      
-      const button = screen.getByRole('button')
-      expect(button).toHaveClass('disabled:opacity-50')
-    })
-  })
+    it("renders ghost variant", () => {
+      render(<Button variant="ghost">Ghost</Button>);
 
-  describe('Interactions', () => {
-    it('handles click events', () => {
-      const handleClick = vi.fn()
-      render(<Button onClick={handleClick}>Click me</Button>)
-      
-      fireEvent.click(screen.getByRole('button'))
-      
-      expect(handleClick).toHaveBeenCalledTimes(1)
-    })
+      const button = screen.getByRole("button");
+      expect(button).toHaveClass("hover:bg-accent");
+    });
 
-    it('does not fire click when disabled', () => {
-      const handleClick = vi.fn()
-      render(<Button disabled onClick={handleClick}>Click me</Button>)
-      
-      fireEvent.click(screen.getByRole('button'))
-      
-      expect(handleClick).not.toHaveBeenCalled()
-    })
-  })
+    it("renders link variant", () => {
+      render(<Button variant="link">Link</Button>);
 
-  describe('Custom className', () => {
-    it('merges custom className with base classes', () => {
-      render(<Button className="custom-class">Custom</Button>)
-      
-      const button = screen.getByRole('button')
-      expect(button).toHaveClass('custom-class')
-      expect(button).toHaveClass('inline-flex')
-    })
-  })
+      const button = screen.getByRole("button");
+      expect(button).toHaveClass("text-primary");
+    });
+  });
 
-  describe('AsChild prop', () => {
-    it('renders as child component when asChild is true', () => {
+  describe("Sizes", () => {
+    it("renders default size", () => {
+      render(<Button size="default">Default Size</Button>);
+
+      const button = screen.getByRole("button");
+      expect(button).toHaveClass("h-9");
+    });
+
+    it("renders small size", () => {
+      render(<Button size="sm">Small</Button>);
+
+      const button = screen.getByRole("button");
+      expect(button).toHaveClass("h-8");
+    });
+
+    it("renders large size", () => {
+      render(<Button size="lg">Large</Button>);
+
+      const button = screen.getByRole("button");
+      expect(button).toHaveClass("h-10");
+    });
+
+    it("renders icon size", () => {
+      render(<Button size="icon">🔍</Button>);
+
+      const button = screen.getByRole("button");
+      expect(button).toHaveClass("size-9");
+    });
+  });
+
+  describe("States", () => {
+    it("handles disabled state", () => {
+      render(<Button disabled>Disabled</Button>);
+
+      const button = screen.getByRole("button");
+      expect(button).toBeDisabled();
+    });
+
+    it("applies disabled styles", () => {
+      render(<Button disabled>Disabled</Button>);
+
+      const button = screen.getByRole("button");
+      expect(button).toHaveClass("disabled:opacity-50");
+    });
+  });
+
+  describe("Interactions", () => {
+    it("handles click events", () => {
+      const handleClick = vi.fn();
+      render(<Button onClick={handleClick}>Click me</Button>);
+
+      fireEvent.click(screen.getByRole("button"));
+
+      expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not fire click when disabled", () => {
+      const handleClick = vi.fn();
+      render(
+        <Button disabled onClick={handleClick}>
+          Click me
+        </Button>
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      expect(handleClick).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Custom className", () => {
+    it("merges custom className with base classes", () => {
+      render(<Button className="custom-class">Custom</Button>);
+
+      const button = screen.getByRole("button");
+      expect(button).toHaveClass("custom-class");
+      expect(button).toHaveClass("inline-flex");
+    });
+  });
+
+  describe("AsChild prop", () => {
+    it("renders as child component when asChild is true", () => {
       render(
         <Button asChild>
           <a href="/test">Link Button</a>
         </Button>
-      )
-      
-      const link = screen.getByRole('link', { name: /link button/i })
-      expect(link).toBeInTheDocument()
-      expect(link).toHaveAttribute('href', '/test')
-    })
-  })
-})
+      );
+
+      const link = screen.getByRole("link", { name: /link button/i });
+      expect(link).toBeInTheDocument();
+      expect(link).toHaveAttribute("href", "/test");
+    });
+  });
+});

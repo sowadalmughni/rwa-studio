@@ -3,12 +3,12 @@
  * Displays invoice history and payment records
  */
 
-import { useState, useEffect } from 'react';
-import { format } from 'date-fns';
-import { FileText, Download, ExternalLink, CheckCircle, XCircle, Clock } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useState, useEffect } from "react";
+import { format } from "date-fns";
+import { FileText, Download, ExternalLink, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -16,8 +16,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Skeleton } from '@/components/ui/skeleton';
+} from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const statusIcons = {
   paid: CheckCircle,
@@ -27,10 +27,10 @@ const statusIcons = {
 };
 
 const statusColors = {
-  paid: 'text-green-500',
-  open: 'text-yellow-500',
-  void: 'text-gray-500',
-  uncollectible: 'text-red-500',
+  paid: "text-green-500",
+  open: "text-yellow-500",
+  void: "text-gray-500",
+  uncollectible: "text-red-500",
 };
 
 export function BillingHistory() {
@@ -44,14 +44,14 @@ export function BillingHistory() {
 
   const fetchInvoices = async () => {
     try {
-      const response = await fetch('/api/billing/invoices', {
+      const response = await fetch("/api/billing/invoices", {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch invoices');
+        throw new Error("Failed to fetch invoices");
       }
 
       const data = await response.json();
@@ -106,15 +106,11 @@ export function BillingHistory() {
           <FileText className="h-5 w-5" />
           Billing History
         </CardTitle>
-        <CardDescription>
-          View and download your past invoices
-        </CardDescription>
+        <CardDescription>View and download your past invoices</CardDescription>
       </CardHeader>
       <CardContent>
         {invoices.length === 0 ? (
-          <p className="text-center text-muted-foreground py-8">
-            No invoices yet
-          </p>
+          <p className="text-center text-muted-foreground py-8">No invoices yet</p>
         ) : (
           <Table>
             <TableHeader>
@@ -128,25 +124,23 @@ export function BillingHistory() {
             <TableBody>
               {invoices.map((invoice) => {
                 const StatusIcon = statusIcons[invoice.status] || Clock;
-                
+
                 return (
                   <TableRow key={invoice.id}>
                     <TableCell>
                       {invoice.invoice_date
-                        ? format(new Date(invoice.invoice_date), 'MMM d, yyyy')
-                        : 'N/A'}
+                        ? format(new Date(invoice.invoice_date), "MMM d, yyyy")
+                        : "N/A"}
                     </TableCell>
                     <TableCell className="font-medium">
-                      ${invoice.amount?.toFixed(2) || '0.00'}{' '}
+                      ${invoice.amount?.toFixed(2) || "0.00"}{" "}
                       <span className="text-muted-foreground uppercase text-xs">
-                        {invoice.currency || 'USD'}
+                        {invoice.currency || "USD"}
                       </span>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <StatusIcon
-                          className={`h-4 w-4 ${statusColors[invoice.status]}`}
-                        />
+                        <StatusIcon className={`h-4 w-4 ${statusColors[invoice.status]}`} />
                         <Badge variant="outline" className="capitalize">
                           {invoice.status}
                         </Badge>
@@ -158,7 +152,7 @@ export function BillingHistory() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => window.open(invoice.invoice_url, '_blank')}
+                            onClick={() => window.open(invoice.invoice_url, "_blank")}
                           >
                             <ExternalLink className="h-4 w-4" />
                           </Button>
@@ -167,7 +161,7 @@ export function BillingHistory() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => window.open(invoice.pdf_url, '_blank')}
+                            onClick={() => window.open(invoice.pdf_url, "_blank")}
                           >
                             <Download className="h-4 w-4" />
                           </Button>

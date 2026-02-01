@@ -1,7 +1,14 @@
-import React from 'react';
-import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import React from "react";
+import { AlertTriangle, RefreshCw, Home } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 /**
  * Error Boundary Component for RWA-Studio
@@ -10,10 +17,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { 
-      hasError: false, 
-      error: null, 
-      errorInfo: null 
+    this.state = {
+      hasError: false,
+      error: null,
+      errorInfo: null,
     };
   }
 
@@ -24,11 +31,11 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     // Log the error to an error reporting service
-    console.error('Error Boundary caught an error:', error, errorInfo);
-    
+    console.error("Error Boundary caught an error:", error, errorInfo);
+
     this.setState({
       error: error,
-      errorInfo: errorInfo
+      errorInfo: errorInfo,
     });
 
     // TODO: Send to error tracking service (e.g., Sentry, LogRocket)
@@ -44,7 +51,7 @@ class ErrorBoundary extends React.Component {
 
   handleGoHome = () => {
     this.setState({ hasError: false, error: null, errorInfo: null });
-    window.location.href = '/';
+    window.location.href = "/";
   };
 
   render() {
@@ -61,9 +68,9 @@ class ErrorBoundary extends React.Component {
                 An unexpected error occurred. Our team has been notified.
               </CardDescription>
             </CardHeader>
-            
+
             <CardContent>
-              {process.env.NODE_ENV !== 'production' && this.state.error && (
+              {process.env.NODE_ENV !== "production" && this.state.error && (
                 <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-auto">
                   <p className="text-sm font-mono text-red-600 dark:text-red-400">
                     {this.state.error.toString()}
@@ -76,7 +83,7 @@ class ErrorBoundary extends React.Component {
                 </div>
               )}
             </CardContent>
-            
+
             <CardFooter className="flex gap-2 justify-center">
               <Button variant="outline" onClick={this.handleGoHome}>
                 <Home className="mr-2 h-4 w-4" />
@@ -116,7 +123,7 @@ export function useErrorHandler() {
 /**
  * Fallback component for Suspense boundaries
  */
-export function SuspenseFallback({ message = 'Loading...' }) {
+export function SuspenseFallback({ message = "Loading..." }) {
   return (
     <div className="flex items-center justify-center p-8">
       <div className="flex flex-col items-center gap-4">
@@ -139,7 +146,7 @@ export function APIErrorFallback({ error, onRetry }) {
           Error Loading Data
         </CardTitle>
         <CardDescription>
-          {error?.message || 'Failed to load data from the server.'}
+          {error?.message || "Failed to load data from the server."}
         </CardDescription>
       </CardHeader>
       {onRetry && (

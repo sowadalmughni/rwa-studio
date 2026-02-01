@@ -35,12 +35,12 @@ RWA-Studio is an open-source platform that enables you to create regulatory-comp
 
 ### Key Benefits
 
-| Traditional Approach | RWA-Studio |
-|---------------------|------------|
-| $50,000+ platform fees | Free & open source |
-| 3-6 months implementation | 5 minutes to deploy |
-| Team of blockchain developers | No coding required |
-| Complex compliance setup | Compliance-by-default |
+| Traditional Approach          | RWA-Studio            |
+| ----------------------------- | --------------------- |
+| $50,000+ platform fees        | Free & open source    |
+| 3-6 months implementation     | 5 minutes to deploy   |
+| Team of blockchain developers | No coding required    |
+| Complex compliance setup      | Compliance-by-default |
 
 ---
 
@@ -71,13 +71,14 @@ RWA-Studio is an open-source platform that enables you to create regulatory-comp
 
 RWA-Studio supports multiple networks:
 
-| Network | Use Case | Gas Costs |
-|---------|----------|-----------|
-| **Sepolia** (Default) | Testing & development | Free (testnet) |
-| **Polygon Amoy** | Testing on Polygon | Free (testnet) |
-| **Ethereum Mainnet** | Production deployments | Variable |
+| Network               | Use Case               | Gas Costs      |
+| --------------------- | ---------------------- | -------------- |
+| **Sepolia** (Default) | Testing & development  | Free (testnet) |
+| **Polygon Amoy**      | Testing on Polygon     | Free (testnet) |
+| **Ethereum Mainnet**  | Production deployments | Variable       |
 
 To switch networks:
+
 1. Open MetaMask
 2. Click the network dropdown
 3. Select your desired network
@@ -107,28 +108,29 @@ Click 5: Deploy Token
 
 Choose the type of asset you're tokenizing:
 
-| Asset Type | Description | Common Use Cases |
-|------------|-------------|------------------|
-| **Real Estate** | Commercial or residential property | REITs, syndications, fractional ownership |
-| **Private Equity** | Ownership in private companies | LP interests, venture funds |
-| **Debt Instruments** | Loans, bonds, notes | Revenue-based financing, fixed income |
-| **Commodities** | Physical goods | Gold, silver, agricultural products |
-| **Equity** | Company shares | Startup equity, employee tokens |
-| **Art & Collectibles** | Fine art, collectibles | Fractional art ownership |
+| Asset Type             | Description                        | Common Use Cases                          |
+| ---------------------- | ---------------------------------- | ----------------------------------------- |
+| **Real Estate**        | Commercial or residential property | REITs, syndications, fractional ownership |
+| **Private Equity**     | Ownership in private companies     | LP interests, venture funds               |
+| **Debt Instruments**   | Loans, bonds, notes                | Revenue-based financing, fixed income     |
+| **Commodities**        | Physical goods                     | Gold, silver, agricultural products       |
+| **Equity**             | Company shares                     | Startup equity, employee tokens           |
+| **Art & Collectibles** | Fine art, collectibles             | Fractional art ownership                  |
 
 ### Click 2: Choose Regulatory Framework
 
 Select the regulatory exemption for your offering:
 
-| Framework | Description | Investor Types | Geographic Limits |
-|-----------|-------------|----------------|-------------------|
-| **Reg D 506(b)** | Private placement | Accredited + up to 35 non-accredited | US only |
-| **Reg D 506(c)** | Private placement (verified) | Accredited only | US only |
-| **Reg S** | Offshore offering | Non-US investors | Non-US only |
-| **Reg CF** | Crowdfunding | Anyone | US only, $5M limit |
-| **Reg A** | Mini-IPO | Anyone | US only, $75M limit |
+| Framework        | Description                  | Investor Types                       | Geographic Limits   |
+| ---------------- | ---------------------------- | ------------------------------------ | ------------------- |
+| **Reg D 506(b)** | Private placement            | Accredited + up to 35 non-accredited | US only             |
+| **Reg D 506(c)** | Private placement (verified) | Accredited only                      | US only             |
+| **Reg S**        | Offshore offering            | Non-US investors                     | Non-US only         |
+| **Reg CF**       | Crowdfunding                 | Anyone                               | US only, $5M limit  |
+| **Reg A**        | Mini-IPO                     | Anyone                               | US only, $75M limit |
 
 **Need help choosing?** Consider:
+
 - Who are your investors? (Accredited vs. general public)
 - Where are they located? (US, international, or both)
 - How much are you raising? (Affects Reg CF/Reg A eligibility)
@@ -138,12 +140,14 @@ Select the regulatory exemption for your offering:
 Set up your token's financial structure:
 
 **Basic Settings:**
+
 - **Token Name**: Full name (e.g., "Manhattan Real Estate Fund I")
 - **Token Symbol**: 3-5 character ticker (e.g., "MREF")
 - **Total Supply**: Maximum number of tokens
 - **Initial Price**: Price per token in USD
 
 **Optional Settings:**
+
 - **Minimum Investment**: Smallest purchase allowed
 - **Maximum per Investor**: Cap per investor (for concentration limits)
 - **Dividend Schedule**: Quarterly, annual, or none
@@ -152,13 +156,13 @@ Set up your token's financial structure:
 
 Configure compliance rules for secondary trading:
 
-| Restriction | Description | Common Settings |
-|-------------|-------------|-----------------|
-| **Holding Period** | Minimum time before transfer | 12 months (Reg D) |
-| **Investor Limit** | Maximum number of investors | 99 (506(b)), 2000 (506(c)) |
-| **Geographic** | Allowed/blocked countries | Based on regulatory framework |
-| **Accreditation** | Require verified accreditation | Required for 506(c) |
-| **KYC Level** | Required verification level | Level 1, 2, or 3 |
+| Restriction        | Description                    | Common Settings               |
+| ------------------ | ------------------------------ | ----------------------------- |
+| **Holding Period** | Minimum time before transfer   | 12 months (Reg D)             |
+| **Investor Limit** | Maximum number of investors    | 99 (506(b)), 2000 (506(c))    |
+| **Geographic**     | Allowed/blocked countries      | Based on regulatory framework |
+| **Accreditation**  | Require verified accreditation | Required for 506(c)           |
+| **KYC Level**      | Required verification level    | Level 1, 2, or 3              |
 
 ### Click 5: Deploy Token
 
@@ -171,6 +175,7 @@ Review your configuration and deploy:
 5. **Success!** Your token is live
 
 After deployment, you'll receive:
+
 - Token contract address
 - Compliance module address
 - Identity registry address
@@ -193,18 +198,19 @@ The dashboard shows all your deployed tokens with key metrics:
 
 For each token, you can:
 
-| Action | Description |
-|--------|-------------|
-| **View Details** | See full token configuration |
-| **Manage Holders** | View and manage investor list |
-| **Mint Tokens** | Create new tokens (if allowed) |
-| **Burn Tokens** | Destroy tokens |
-| **Pause/Unpause** | Emergency transfer freeze |
-| **Update Compliance** | Modify compliance rules |
+| Action                | Description                    |
+| --------------------- | ------------------------------ |
+| **View Details**      | See full token configuration   |
+| **Manage Holders**    | View and manage investor list  |
+| **Mint Tokens**       | Create new tokens (if allowed) |
+| **Burn Tokens**       | Destroy tokens                 |
+| **Pause/Unpause**     | Emergency transfer freeze      |
+| **Update Compliance** | Modify compliance rules        |
 
 ### Viewing Token Details
 
 Click any token to see:
+
 - Contract addresses
 - Current supply and distribution
 - Holder breakdown by jurisdiction
@@ -227,6 +233,7 @@ The Transfer Agent Console provides professional tools for managing your tokens'
 #### Holder Registry
 
 View all token holders with:
+
 - Wallet addresses
 - Token balance
 - KYC status
@@ -237,6 +244,7 @@ View all token holders with:
 #### Transfer History
 
 Monitor all token transfers:
+
 - Sender and recipient
 - Amount transferred
 - Timestamp
@@ -246,6 +254,7 @@ Monitor all token transfers:
 #### Pending Transfers
 
 For tokens requiring manual approval:
+
 - Review pending transfer requests
 - Approve or reject with comments
 - Bulk approval for multiple transfers
@@ -296,7 +305,7 @@ Transfer Request
 
 #### Removing Rules
 
-⚠️ **Warning**: Removing compliance rules may affect your regulatory status.
+**Warning**: Removing compliance rules may affect your regulatory status.
 
 1. Select the rule to remove
 2. Click **Remove**
@@ -306,11 +315,13 @@ Transfer Request
 ### Compliance Reports
 
 Generate reports for:
+
 - Regulatory filings
 - Audit purposes
 - Investor communications
 
 **Available Reports:**
+
 - Holder composition report
 - Transfer activity report
 - Compliance violation log
@@ -324,14 +335,14 @@ Generate reports for:
 
 The Identity Registry tracks verified investors:
 
-| Field | Description |
-|-------|-------------|
-| **Address** | Ethereum wallet address |
-| **Country** | Jurisdiction of residence |
-| **KYC Level** | Verification level (1-3) |
-| **Accredited** | Accreditation status |
+| Field             | Description                     |
+| ----------------- | ------------------------------- |
+| **Address**       | Ethereum wallet address         |
+| **Country**       | Jurisdiction of residence       |
+| **KYC Level**     | Verification level (1-3)        |
+| **Accredited**    | Accreditation status            |
 | **Verified Date** | When verification was completed |
-| **Expiry Date** | When re-verification is needed |
+| **Expiry Date**   | When re-verification is needed  |
 
 ### Verifying Investors
 
@@ -345,6 +356,7 @@ The Identity Registry tracks verified investors:
 #### Automated Verification (Onfido Integration)
 
 If configured, investors can self-verify:
+
 1. Investor submits ID documents
 2. Onfido performs verification
 3. Results automatically update registry
@@ -352,17 +364,18 @@ If configured, investors can self-verify:
 
 ### KYC Levels
 
-| Level | Requirements | Use Case |
-|-------|--------------|----------|
-| **Level 1** | Basic identity | Low-value transactions |
-| **Level 2** | ID verification + address | Standard investments |
-| **Level 3** | Enhanced due diligence | High-value or high-risk |
+| Level       | Requirements              | Use Case                |
+| ----------- | ------------------------- | ----------------------- |
+| **Level 1** | Basic identity            | Low-value transactions  |
+| **Level 2** | ID verification + address | Standard investments    |
+| **Level 3** | Enhanced due diligence    | High-value or high-risk |
 
 ### Managing Accreditation
 
 For Reg D 506(c) offerings, you must verify accreditation:
 
 **Accepted Methods:**
+
 - CPA/Attorney letter
 - Broker-dealer verification
 - Third-party verification service
@@ -376,6 +389,7 @@ For Reg D 506(c) offerings, you must verify accreditation:
 ### What are Asset Pages?
 
 Shareable public pages for your token offering with:
+
 - Asset description and images
 - Token economics
 - Compliance badge
@@ -401,6 +415,7 @@ Shareable public pages for your token offering with:
 ### Customizing Your Page
 
 **Available Sections:**
+
 - Hero banner with title and description
 - Asset gallery (images/videos)
 - Key metrics and terms
@@ -413,11 +428,13 @@ Shareable public pages for your token offering with:
 ### Sharing Your Page
 
 Each asset page gets a unique URL:
+
 ```
 https://your-domain.com/assets/your-token-symbol
 ```
 
 Share this with potential investors. Each page includes:
+
 - 🔒 Compliance badge showing regulatory framework
 - "Powered by RWA-Studio" branding
 
@@ -427,11 +444,11 @@ Share this with potential investors. Each page includes:
 
 ### Subscription Plans
 
-| Plan | Price | Features |
-|------|-------|----------|
-| **Free** | $0/mo | 1 token, basic features |
-| **Pro** | $299/mo | Unlimited tokens, API access, priority support |
-| **Enterprise** | Custom | White-label, custom compliance, dedicated support |
+| Plan           | Price   | Features                                          |
+| -------------- | ------- | ------------------------------------------------- |
+| **Free**       | $0/mo   | 1 token, basic features                           |
+| **Pro**        | $299/mo | Unlimited tokens, API access, priority support    |
+| **Enterprise** | Custom  | White-label, custom compliance, dedicated support |
 
 ### Managing Your Subscription
 
@@ -444,6 +461,7 @@ Share this with potential investors. Each page includes:
 ### Transaction Fees
 
 Some operations incur platform fees:
+
 - Token deployment: Included in subscription
 - Transfer agent API calls: $0.10 per call (Pro plan)
 - Asset page hosting: Included
@@ -503,6 +521,6 @@ A: If you have multiple admins configured, another admin can remove the lost wal
 
 ---
 
-**Built with ❤️ by Sowad Al-Mughni**
+**Built by Sowad Al-Mughni**
 
-*"Tokenize Real-World Assets in 5 Clicks"*
+_"Tokenize Real-World Assets in 5 Clicks"_

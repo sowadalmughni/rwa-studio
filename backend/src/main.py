@@ -8,7 +8,8 @@ security middleware, rate limiting, and error handling.
 
 import os
 import sys
-# DON'T CHANGE THIS !!!
+
+# Required for module resolution when running main.py directly
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from flask import Flask, send_from_directory
@@ -162,8 +163,8 @@ def serve(path):
 
 
 if __name__ == '__main__':
-    print(f"🚀 RWA-Studio Backend starting...")
-    print(f"   Environment: {config.FLASK_ENV}")
-    print(f"   Debug: {config.DEBUG}")
-    print(f"   Host: {config.HOST}:{config.PORT}")
+    print(f"RWA-Studio Backend starting...")
+    print(f"  Environment: {config.FLASK_ENV}")
+    print(f"  Debug: {config.DEBUG}")
+    print(f"  Host: {config.HOST}:{config.PORT}")
     app.run(host=config.HOST, port=config.PORT, debug=config.DEBUG)

@@ -3,19 +3,19 @@
  * Handles Stripe checkout flow
  */
 
-import { useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-import { Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { loadStripe } from "@stripe/stripe-js";
+import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 // Initialize Stripe (use environment variable in production)
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "");
 
 export function CheckoutButton({
   plan,
   className,
-  variant = 'default',
+  variant = "default",
   loading: externalLoading,
   onLoadingChange,
   children,
@@ -33,11 +33,11 @@ export function CheckoutButton({
 
     try {
       // Create checkout session
-      const response = await fetch('/api/billing/checkout', {
-        method: 'POST',
+      const response = await fetch("/api/billing/checkout", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
           plan,
@@ -48,7 +48,7 @@ export function CheckoutButton({
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to create checkout session');
+        throw new Error(error.error || "Failed to create checkout session");
       }
 
       const { checkout_url } = await response.json();
@@ -57,29 +57,24 @@ export function CheckoutButton({
       if (checkout_url) {
         window.location.href = checkout_url;
       } else {
-        throw new Error('No checkout URL returned');
+        throw new Error("No checkout URL returned");
       }
     } catch (error) {
-      console.error('Checkout error:', error);
-      toast.error(error.message || 'Failed to start checkout');
+      console.error("Checkout error:", error);
+      toast.error(error.message || "Failed to start checkout");
       setLoading(false);
     }
   };
 
   return (
-    <Button
-      onClick={handleCheckout}
-      disabled={loading}
-      className={className}
-      variant={variant}
-    >
+    <Button onClick={handleCheckout} disabled={loading} className={className} variant={variant}>
       {loading ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           Processing...
         </>
       ) : (
-        children || 'Subscribe'
+        children || "Subscribe"
       )}
     </Button>
   );

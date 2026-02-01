@@ -264,7 +264,7 @@ jobs:
 
       - name: Deploy to staging
         run: |
-          echo "🚀 Deploying to staging environment..."
+          echo "Deploying to staging environment..."
           # Add your staging deployment commands here
           # Examples:
           # - AWS: aws s3 sync frontend/dist s3://staging-bucket
@@ -292,6 +292,6 @@ jobs:
 
       - name: Deploy to production
         run: |
-          echo "🚀 Deploying to production environment..."
+          echo "Deploying to production environment..."
           # Add your production deployment commands here
           # Ensure all security checks passed before reaching this step

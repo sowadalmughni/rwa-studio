@@ -3,13 +3,13 @@
  * Displays current subscription details and management options
  */
 
-import { useState } from 'react';
-import { format } from 'date-fns';
-import { CreditCard, Calendar, Zap, AlertCircle, CheckCircle } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { useState } from "react";
+import { format } from "date-fns";
+import { CreditCard, Calendar, Zap, AlertCircle, CheckCircle } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,23 +20,23 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { toast } from 'sonner';
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 const statusColors = {
-  active: 'bg-green-500',
-  trialing: 'bg-blue-500',
-  past_due: 'bg-yellow-500',
-  canceled: 'bg-red-500',
-  incomplete: 'bg-gray-500',
+  active: "bg-green-500",
+  trialing: "bg-blue-500",
+  past_due: "bg-yellow-500",
+  canceled: "bg-red-500",
+  incomplete: "bg-gray-500",
 };
 
 const statusLabels = {
-  active: 'Active',
-  trialing: 'Trial',
-  past_due: 'Past Due',
-  canceled: 'Canceled',
-  incomplete: 'Incomplete',
+  active: "Active",
+  trialing: "Trial",
+  past_due: "Past Due",
+  canceled: "Canceled",
+  incomplete: "Incomplete",
 };
 
 export function SubscriptionStatus({ subscription, onRefresh }) {
@@ -45,23 +45,23 @@ export function SubscriptionStatus({ subscription, onRefresh }) {
   const handleCancelSubscription = async () => {
     setCanceling(true);
     try {
-      const response = await fetch('/api/billing/cancel', {
-        method: 'POST',
+      const response = await fetch("/api/billing/cancel", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({ at_period_end: true }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to cancel subscription');
+        throw new Error("Failed to cancel subscription");
       }
 
-      toast.success('Subscription will be canceled at the end of the billing period');
+      toast.success("Subscription will be canceled at the end of the billing period");
       onRefresh?.();
     } catch (error) {
-      toast.error('Failed to cancel subscription');
+      toast.error("Failed to cancel subscription");
     } finally {
       setCanceling(false);
     }
@@ -75,16 +75,14 @@ export function SubscriptionStatus({ subscription, onRefresh }) {
             <CreditCard className="h-5 w-5" />
             No Active Subscription
           </CardTitle>
-          <CardDescription>
-            Choose a plan to start tokenizing your assets
-          </CardDescription>
+          <CardDescription>Choose a plan to start tokenizing your assets</CardDescription>
         </CardHeader>
       </Card>
     );
   }
 
   const usagePercent = (subscription.tokens_used / subscription.tokens_limit) * 100;
-  const isActive = subscription.status === 'active' || subscription.status === 'trialing';
+  const isActive = subscription.status === "active" || subscription.status === "trialing";
 
   return (
     <Card>
@@ -94,20 +92,17 @@ export function SubscriptionStatus({ subscription, onRefresh }) {
             <CreditCard className="h-5 w-5" />
             {subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1)} Plan
           </CardTitle>
-          <Badge
-            variant="outline"
-            className={`${statusColors[subscription.status]} text-white`}
-          >
+          <Badge variant="outline" className={`${statusColors[subscription.status]} text-white`}>
             {statusLabels[subscription.status]}
           </Badge>
         </div>
         <CardDescription>
           {subscription.cancel_at_period_end
-            ? 'Your subscription will end at the end of the current billing period'
+            ? "Your subscription will end at the end of the current billing period"
             : `Your subscription renews on ${
                 subscription.current_period_end
-                  ? format(new Date(subscription.current_period_end), 'MMMM d, yyyy')
-                  : 'N/A'
+                  ? format(new Date(subscription.current_period_end), "MMMM d, yyyy")
+                  : "N/A"
               }`}
         </CardDescription>
       </CardHeader>
@@ -138,21 +133,19 @@ export function SubscriptionStatus({ subscription, onRefresh }) {
               <p className="font-medium">Current Period</p>
               <p className="text-sm text-muted-foreground">
                 {subscription.current_period_start
-                  ? format(new Date(subscription.current_period_start), 'MMM d')
-                  : 'N/A'}{' '}
-                -{' '}
+                  ? format(new Date(subscription.current_period_start), "MMM d")
+                  : "N/A"}{" "}
+                -{" "}
                 {subscription.current_period_end
-                  ? format(new Date(subscription.current_period_end), 'MMM d, yyyy')
-                  : 'N/A'}
+                  ? format(new Date(subscription.current_period_end), "MMM d, yyyy")
+                  : "N/A"}
               </p>
             </div>
           </div>
           {isActive && !subscription.cancel_at_period_end && (
             <CheckCircle className="h-5 w-5 text-green-500" />
           )}
-          {subscription.cancel_at_period_end && (
-            <AlertCircle className="h-5 w-5 text-yellow-500" />
-          )}
+          {subscription.cancel_at_period_end && <AlertCircle className="h-5 w-5 text-yellow-500" />}
         </div>
 
         {/* Actions */}
@@ -168,8 +161,8 @@ export function SubscriptionStatus({ subscription, onRefresh }) {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Cancel Subscription?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Your subscription will remain active until the end of the current
-                    billing period. You won't be charged again.
+                    Your subscription will remain active until the end of the current billing
+                    period. You won't be charged again.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -179,7 +172,7 @@ export function SubscriptionStatus({ subscription, onRefresh }) {
                     disabled={canceling}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
-                    {canceling ? 'Canceling...' : 'Cancel Subscription'}
+                    {canceling ? "Canceling..." : "Cancel Subscription"}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -187,7 +180,12 @@ export function SubscriptionStatus({ subscription, onRefresh }) {
           )}
 
           {subscription.cancel_at_period_end && (
-            <Button variant="default" onClick={() => {/* Reactivate logic */}}>
+            <Button
+              variant="default"
+              onClick={() => {
+                /* Reactivate logic */
+              }}
+            >
               Reactivate Subscription
             </Button>
           )}

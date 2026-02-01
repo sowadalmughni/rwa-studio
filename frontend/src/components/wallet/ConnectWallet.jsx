@@ -1,13 +1,13 @@
 /**
  * ConnectWallet Button Component for RWA-Studio
- * 
+ *
  * A customizable button that handles wallet connection and authentication
  */
 
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useWallet } from '../../hooks/useWallet';
-import { Button } from '../ui/button';
-import { Wallet, LogOut, User, ChevronDown, Shield, AlertCircle } from 'lucide-react';
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useWallet } from "../../hooks/useWallet";
+import { Button } from "../ui/button";
+import { Wallet, LogOut, User, ChevronDown, Shield, AlertCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,22 +15,22 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
-import { Badge } from '../ui/badge';
+} from "../ui/dropdown-menu";
+import { Badge } from "../ui/badge";
 
 /**
  * Custom ConnectWallet component with RWA-Studio branding
  */
-export function ConnectWallet({ showBalance = true, variant = 'default' }) {
-  const { 
-    isConnected, 
+export function ConnectWallet({ showBalance = true, variant = "default" }) {
+  const {
+    isConnected,
     isAuthenticated,
     user,
     logout,
     authenticateWithWallet,
     isAuthenticating,
     error,
-    shortenedAddress
+    shortenedAddress,
   } = useWallet();
 
   return (
@@ -44,28 +44,24 @@ export function ConnectWallet({ showBalance = true, variant = 'default' }) {
         authenticationStatus,
         mounted,
       }) => {
-        const ready = mounted && authenticationStatus !== 'loading';
+        const ready = mounted && authenticationStatus !== "loading";
         const connected = ready && account && chain;
 
         return (
           <div
             {...(!ready && {
-              'aria-hidden': true,
+              "aria-hidden": true,
               style: {
                 opacity: 0,
-                pointerEvents: 'none',
-                userSelect: 'none',
+                pointerEvents: "none",
+                userSelect: "none",
               },
             })}
           >
             {(() => {
               if (!connected) {
                 return (
-                  <Button
-                    onClick={openConnectModal}
-                    variant={variant}
-                    className="gap-2"
-                  >
+                  <Button onClick={openConnectModal} variant={variant} className="gap-2">
                     <Wallet className="h-4 w-4" />
                     Connect Wallet
                   </Button>
@@ -74,11 +70,7 @@ export function ConnectWallet({ showBalance = true, variant = 'default' }) {
 
               if (chain.unsupported) {
                 return (
-                  <Button
-                    onClick={openChainModal}
-                    variant="destructive"
-                    className="gap-2"
-                  >
+                  <Button onClick={openChainModal} variant="destructive" className="gap-2">
                     <AlertCircle className="h-4 w-4" />
                     Wrong Network
                   </Button>
@@ -88,12 +80,7 @@ export function ConnectWallet({ showBalance = true, variant = 'default' }) {
               return (
                 <div className="flex items-center gap-2">
                   {/* Chain Selector */}
-                  <Button
-                    onClick={openChainModal}
-                    variant="outline"
-                    size="sm"
-                    className="gap-2"
-                  >
+                  <Button onClick={openChainModal} variant="outline" size="sm" className="gap-2">
                     {chain.hasIcon && (
                       <div
                         className="h-4 w-4 overflow-hidden rounded-full"
@@ -101,7 +88,7 @@ export function ConnectWallet({ showBalance = true, variant = 'default' }) {
                       >
                         {chain.iconUrl && (
                           <img
-                            alt={chain.name ?? 'Chain icon'}
+                            alt={chain.name ?? "Chain icon"}
                             src={chain.iconUrl}
                             className="h-4 w-4"
                           />
@@ -116,15 +103,13 @@ export function ConnectWallet({ showBalance = true, variant = 'default' }) {
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" className="gap-2">
                         {showBalance && account.displayBalance && (
-                          <span className="hidden sm:inline">
-                            {account.displayBalance}
-                          </span>
+                          <span className="hidden sm:inline">{account.displayBalance}</span>
                         )}
                         <span>{account.displayName}</span>
                         <ChevronDown className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    
+
                     <DropdownMenuContent align="end" className="w-56">
                       <DropdownMenuLabel className="font-normal">
                         <div className="flex flex-col space-y-1">
@@ -152,34 +137,34 @@ export function ConnectWallet({ showBalance = true, variant = 'default' }) {
                           )}
                         </div>
                       </DropdownMenuLabel>
-                      
+
                       <DropdownMenuSeparator />
-                      
+
                       <DropdownMenuItem onClick={openAccountModal}>
                         <Wallet className="mr-2 h-4 w-4" />
                         <span>Wallet Details</span>
                       </DropdownMenuItem>
-                      
+
                       {!isAuthenticated && (
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={authenticateWithWallet}
                           disabled={isAuthenticating}
                         >
                           <Shield className="mr-2 h-4 w-4" />
-                          <span>{isAuthenticating ? 'Authenticating...' : 'Authenticate'}</span>
+                          <span>{isAuthenticating ? "Authenticating..." : "Authenticate"}</span>
                         </DropdownMenuItem>
                       )}
-                      
+
                       {isAuthenticated && (
                         <DropdownMenuItem>
                           <User className="mr-2 h-4 w-4" />
                           <span>Profile Settings</span>
                         </DropdownMenuItem>
                       )}
-                      
+
                       <DropdownMenuSeparator />
-                      
-                      <DropdownMenuItem 
+
+                      <DropdownMenuItem
                         onClick={logout}
                         className="text-red-500 focus:text-red-500"
                       >

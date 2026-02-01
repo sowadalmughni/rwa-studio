@@ -1,44 +1,44 @@
 /**
  * Public Asset Page Component for RWA-Studio
- * 
+ *
  * Displays token information publicly with sharing and referral support
  */
 
-import { useState, useEffect } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { ShareWidget } from '@/components/share/ShareWidget';
-import { 
-  Shield, 
-  Globe, 
-  Building, 
-  FileText, 
+import { useState, useEffect } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ShareWidget } from "@/components/share/ShareWidget";
+import {
+  Shield,
+  Globe,
+  Building,
+  FileText,
   ExternalLink,
   Users,
   TrendingUp,
   Lock,
-  CheckCircle
-} from 'lucide-react';
+  CheckCircle,
+} from "lucide-react";
 
 // Framework badge colors
 const FRAMEWORK_COLORS = {
-  'reg-d': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
-  'reg-s': { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
-  'reg-cf': { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
-  'reg-a': { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200' },
-  'custom': { bg: 'bg-gray-50', text: 'text-gray-700', border: 'border-gray-200' }
+  "reg-d": { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200" },
+  "reg-s": { bg: "bg-purple-50", text: "text-purple-700", border: "border-purple-200" },
+  "reg-cf": { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200" },
+  "reg-a": { bg: "bg-green-50", text: "text-green-700", border: "border-green-200" },
+  custom: { bg: "bg-gray-50", text: "text-gray-700", border: "border-gray-200" },
 };
 
 // Asset type icons
 const ASSET_ICONS = {
-  'real-estate': Building,
-  'private-equity': TrendingUp,
-  'debt': FileText,
-  'commodities': Globe,
-  'ip': FileText
+  "real-estate": Building,
+  "private-equity": TrendingUp,
+  debt: FileText,
+  commodities: Globe,
+  ip: FileText,
 };
 
 export function AssetPage() {
@@ -48,8 +48,8 @@ export function AssetPage() {
   const [error, setError] = useState(null);
   const [pageData, setPageData] = useState(null);
 
-  const refCode = searchParams.get('ref');
-  const utmSource = searchParams.get('utm_source');
+  const refCode = searchParams.get("ref");
+  const utmSource = searchParams.get("utm_source");
 
   useEffect(() => {
     loadAssetData();
@@ -63,15 +63,15 @@ export function AssetPage() {
       // Build URL with tracking params
       let url = `/api/assets/${tokenAddress}`;
       const params = new URLSearchParams();
-      if (refCode) params.append('ref', refCode);
-      if (utmSource) params.append('utm_source', utmSource);
+      if (refCode) params.append("ref", refCode);
+      if (utmSource) params.append("utm_source", utmSource);
       if (params.toString()) url += `?${params.toString()}`;
 
       const response = await fetch(url);
       const data = await response.json();
 
       if (!data.success) {
-        throw new Error(data.error || 'Failed to load asset data');
+        throw new Error(data.error || "Failed to load asset data");
       }
 
       setPageData(data.data);
@@ -106,7 +106,7 @@ export function AssetPage() {
   }
 
   const { token, stats, badges, share_urls, embed_codes } = pageData;
-  const framework = token.regulatory_framework?.toLowerCase().replace(' ', '-') || 'custom';
+  const framework = token.regulatory_framework?.toLowerCase().replace(" ", "-") || "custom";
   const frameworkColors = FRAMEWORK_COLORS[framework] || FRAMEWORK_COLORS.custom;
   const AssetIcon = ASSET_ICONS[token.asset_type] || Building;
 
@@ -119,7 +119,7 @@ export function AssetPage() {
             <Lock className="h-5 w-5 text-primary" />
             <span className="font-semibold text-gray-900">RWA-Studio</span>
           </div>
-          <ShareWidget 
+          <ShareWidget
             tokenAddress={token.token_address}
             tokenName={token.token_name}
             tokenSymbol={token.token_symbol}
@@ -138,17 +138,13 @@ export function AssetPage() {
                   <AssetIcon className="h-8 w-8 text-primary" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
-                    {token.token_name}
-                  </h1>
-                  <p className="text-lg text-primary font-semibold">
-                    ${token.token_symbol}
-                  </p>
+                  <h1 className="text-2xl font-bold text-gray-900">{token.token_name}</h1>
+                  <p className="text-lg text-primary font-semibold">${token.token_symbol}</p>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
                 {badges?.map((badge, index) => (
-                  <Badge 
+                  <Badge
                     key={index}
                     variant="outline"
                     className={`${frameworkColors.bg} ${frameworkColors.text} ${frameworkColors.border}`}
@@ -159,32 +155,26 @@ export function AssetPage() {
               </div>
             </div>
 
-            {token.description && (
-              <p className="mt-4 text-gray-600">{token.description}</p>
-            )}
+            {token.description && <p className="mt-4 text-gray-600">{token.description}</p>}
           </div>
 
           {/* Stats Grid */}
           <CardContent className="p-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <StatItem 
-                label="Asset Type" 
-                value={token.asset_type?.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())} 
+              <StatItem
+                label="Asset Type"
+                value={token.asset_type?.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                 icon={AssetIcon}
               />
-              <StatItem 
-                label="Framework" 
-                value={token.regulatory_framework?.toUpperCase()} 
+              <StatItem
+                label="Framework"
+                value={token.regulatory_framework?.toUpperCase()}
                 icon={FileText}
               />
-              <StatItem 
-                label="Jurisdiction" 
-                value={token.jurisdiction} 
-                icon={Globe}
-              />
-              <StatItem 
-                label="Verified Investors" 
-                value={stats?.verified_investors || 0} 
+              <StatItem label="Jurisdiction" value={token.jurisdiction} icon={Globe} />
+              <StatItem
+                label="Verified Investors"
+                value={stats?.verified_investors || 0}
                 icon={Users}
               />
             </div>
@@ -204,15 +194,19 @@ export function AssetPage() {
               <DetailRow label="Token Address" value={token.token_address} isAddress />
               <DetailRow label="Max Supply" value={formatNumber(token.max_supply)} />
               <DetailRow label="Compliance Module" value={token.compliance_address} isAddress />
-              <DetailRow label="Identity Registry" value={token.identity_registry_address} isAddress />
+              <DetailRow
+                label="Identity Registry"
+                value={token.identity_registry_address}
+                isAddress
+              />
               {token.deployment_date && (
-                <DetailRow 
-                  label="Deployed" 
-                  value={new Date(token.deployment_date).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })} 
+                <DetailRow
+                  label="Deployed"
+                  value={new Date(token.deployment_date).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
                 />
               )}
             </div>
@@ -229,23 +223,23 @@ export function AssetPage() {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2">
-              <ComplianceBadge 
-                title="ERC-3643 Compliant" 
+              <ComplianceBadge
+                title="ERC-3643 Compliant"
                 description="Token implements the ERC-3643 security token standard"
                 verified
               />
-              <ComplianceBadge 
+              <ComplianceBadge
                 title={`${token.regulatory_framework} Compliant`}
                 description={`Structured for ${token.regulatory_framework} exemption`}
                 verified
               />
-              <ComplianceBadge 
-                title="Identity Verification" 
+              <ComplianceBadge
+                title="Identity Verification"
                 description="On-chain identity registry for investor verification"
                 verified={!!token.identity_registry_address}
               />
-              <ComplianceBadge 
-                title="Transfer Restrictions" 
+              <ComplianceBadge
+                title="Transfer Restrictions"
                 description="Automated compliance rules enforced on transfers"
                 verified={!!token.compliance_address}
               />
@@ -256,9 +250,7 @@ export function AssetPage() {
         {/* CTA Section */}
         <Card className="bg-gradient-to-r from-primary to-primary/80 text-white">
           <CardContent className="p-8 text-center">
-            <h2 className="text-xl font-bold mb-2">
-              Interested in This Offering?
-            </h2>
+            <h2 className="text-xl font-bold mb-2">Interested in This Offering?</h2>
             <p className="text-white/80 mb-6">
               Contact the issuer for more information about participating.
             </p>
@@ -267,8 +259,8 @@ export function AssetPage() {
                 <Mail className="h-4 w-4 mr-2" />
                 Contact Issuer
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="lg"
                 className="bg-white/10 border-white/30 text-white hover:bg-white/20"
               >
@@ -283,7 +275,10 @@ export function AssetPage() {
         <footer className="mt-8 text-center text-sm text-gray-500">
           <p className="flex items-center justify-center gap-2">
             <Lock className="h-4 w-4" />
-            Verified by <a href="/" className="text-primary hover:underline">RWA-Studio</a>
+            Verified by{" "}
+            <a href="/" className="text-primary hover:underline">
+              RWA-Studio
+            </a>
           </p>
           <p className="mt-2 text-xs">
             ⚠️ This is an informational page. Conduct your own due diligence before investing.
@@ -311,7 +306,7 @@ function DetailRow({ label, value, isAddress }) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between py-2 border-b last:border-0">
       <span className="text-sm text-muted-foreground">{label}</span>
-      <span className={`font-mono text-sm ${isAddress ? 'truncate max-w-[300px]' : ''}`}>
+      <span className={`font-mono text-sm ${isAddress ? "truncate max-w-[300px]" : ""}`}>
         {value}
       </span>
     </div>
@@ -320,9 +315,11 @@ function DetailRow({ label, value, isAddress }) {
 
 function ComplianceBadge({ title, description, verified }) {
   return (
-    <div className={`p-4 rounded-lg border ${verified ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
+    <div
+      className={`p-4 rounded-lg border ${verified ? "bg-green-50 border-green-200" : "bg-gray-50 border-gray-200"}`}
+    >
       <div className="flex items-start gap-3">
-        <div className={`p-1 rounded-full ${verified ? 'bg-green-100' : 'bg-gray-100'}`}>
+        <div className={`p-1 rounded-full ${verified ? "bg-green-100" : "bg-gray-100"}`}>
           {verified ? (
             <CheckCircle className="h-5 w-5 text-green-600" />
           ) : (
@@ -352,13 +349,13 @@ function AssetPageSkeleton() {
 }
 
 function formatNumber(value) {
-  if (!value) return '0';
+  if (!value) return "0";
   const num = parseFloat(value);
   if (isNaN(num)) return value;
   return num.toLocaleString();
 }
 
 // Import Mail icon that we're using
-import { Mail } from 'lucide-react';
+import { Mail } from "lucide-react";
 
 export default AssetPage;

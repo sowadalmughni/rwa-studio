@@ -15,19 +15,20 @@
     "build:contracts": "cd smart-contracts && npx hardhat compile",
     "test": "npm run test:contracts",
     "test:contracts": "cd smart-contracts && npx hardhat test",
+    "test:backend": "cd backend && pytest tests/ -v",
+    "lint": "npm run lint:frontend",
     "lint:frontend": "cd frontend && pnpm run lint",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md}\"",
     "install:all": "cd frontend && pnpm install && cd ../smart-contracts && npm install && cd ../backend && pip install -r requirements.txt",
-    "clean": "rimraf node_modules frontend/node_modules smart-contracts/node_modules"
+    "clean": "rimraf node_modules frontend/node_modules smart-contracts/node_modules",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
     "husky": "^8.0.3",
-    "lint-staged": "^15.2.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.2.0"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -58,4 +59,3 @@
     "npm": ">=8.0.0"
   }
 }
-
